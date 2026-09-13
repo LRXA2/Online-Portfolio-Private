@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+import '../styles/navbar.css';
+import '../styles/editorial.css';
+import '../styles/typography.css';
+import Navbar from '../components/Navbar.astro';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Montserrat:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body>
+    <Navbar />
+    <slot />
+
+    <script>
+      // Scroll same-page navigation links to their target.
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.navbar-link, .navbar-brand').forEach((link) => {
+          link.addEventListener('click', function (this: HTMLAnchorElement, e) {
+            const href = this.getAttribute('href');
+            if (!href) return;
+            const url = new URL(href, window.location.origin);
+            const isSamePage = window.location.pathname === url.pathname;
+            if (isSamePage && url.hash) {
+              e.preventDefault();
+              const target = document.querySelector(url.hash);
+              if (target) target.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

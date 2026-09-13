@@ -1,0 +1,96 @@
+﻿---
+import type { Project, ProjectDetail } from '../data/projects';
+import '../styles/dossier.css';
+interface Props { project: Project; detail: ProjectDetail; dialogOnly?: boolean }
+const { project, detail, dialogOnly = false } = Astro.props;
+const assetUrl = (path: string) => import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + path;
+const id = `dossier-${project.slug}`;
+---
+{!dialogOnly && <article class="dossier-cover">
+  <div class="dossier-cover__body">
+    <div>
+      <p class="dossier-eyebrow">{detail.eyebrow} <span aria-hidden="true">&middot;</span> {project.year}</p>
+      <h3>{project.name}</h3>
+      {detail.recognition && <a class="dossier-featured" href={detail.recognition.url} target="_blank" rel="noopener noreferrer">{detail.recognition.label} &#8599;</a>}
+      <p>{project.blurb}</p>
+      <ul class="dossier-stack">{project.stack.map(s => <li>{s}</li>)}</ul>
+    </div>
+  </div>
+  <div class="dossier-actions">
+    <button type="button" data-open-dossier={id} aria-haspopup="dialog">Open project dossier <span aria-hidden="true">↗</span></button>
+    {project.repo && <a href={project.repo} target="_blank" rel="noopener noreferrer">View repository ↗</a>}
+  </div>
+</article>}
+<dialog id={id} class="project-dialog" aria-labelledby={`${id}-title`}>
+  <div class="dialog-toolbar"><span>PROJECT DOSSIER / {project.year}</span><button type="button" data-close-dossier autofocus aria-label="Close project dossier">Close ×</button></div>
+  <div class="dialog-content">
+    <p class="dossier-eyebrow">{detail.eyebrow}</p>
+    <h2 id={`${id}-title`}>{project.name}</h2>
+    <p class="dialog-summary">{project.blurb}</p>
+    <ul class="dossier-stack">{project.stack.map(s => <li>{s}</li>)}</ul>
+    {detail.recognition && <aside class="dossier-recognition" aria-label="Recognition">
+      <span class="dossier-eyebrow">RECOGNITION / {detail.recognition.year}</span>
+      <h3>{detail.recognition.title}</h3><p>{detail.recognition.body}</p>
+      <a href={detail.recognition.url} target="_blank" rel="noopener noreferrer">{detail.recognition.linkLabel} &#8599;</a>
+    </aside>}
+    {detail.galleries?.map(gallery => <section class="dossier-gallery-section" aria-label={gallery.title}>
+      <h3>{gallery.title}</h3><p>{gallery.description}</p>
+      <div class:list={['dossier-gallery', { 'dossier-gallery--components': gallery.images.length > 2 }]}>
+        {gallery.images.map(img => <figure>
+          <a href={assetUrl(img.src)} target="_blank" rel="noopener noreferrer" aria-label={'Open full-size image: ' + img.caption}>
+            <img src={assetUrl(img.src)} alt={img.alt} width={img.width} height={img.height} loading="lazy" decoding="async" />
+          </a>
+          <figcaption>{img.caption}<span aria-hidden="true"> &#8599;</span></figcaption>
+        </figure>)}
+      </div>
+    </section>)}
+    {detail.mediaCredit && <p class="dossier-media-credit">{detail.mediaCredit}</p>}
+    {detail.pipeline && <section class="retrieval-visual" aria-label={detail.pipeline.title}>
+      <p class="dossier-eyebrow">RETRIEVAL / SYSTEM MAP</p>
+      <h3>{detail.pipeline.title}</h3>
+      <div class="retrieval-input">{detail.pipeline.input}</div>
+      <div class="retrieval-branches">{detail.pipeline.branches.map(branch => <div><h4>{branch.title}</h4><p>{branch.body}</p></div>)}</div>
+      <ol class="retrieval-stages">{detail.pipeline.stages.map((stage, i) => <li><span aria-hidden="true">0{i + 1}</span><div><h4>{stage.title}</h4><p>{stage.body}</p></div></li>)}</ol>
+      <aside class="retrieval-example">
+        <p class="dossier-eyebrow">ILLUSTRATIVE QUERY / NOT A LIVE DEMO</p>
+        <blockquote>{detail.pipeline.example.query}</blockquote>
+        <ul>{detail.pipeline.example.filters.map(filter => <li>{filter}</li>)}</ul>
+        <p class="retrieval-result">{detail.pipeline.example.result}</p>
+        <p>{detail.pipeline.example.explanation}</p>
+      </aside>
+    </section>}
+    <figure class="dossier-placeholder">
+      <span class="dossier-eyebrow">{detail.workflowLabel}</span>
+      <p>{detail.workflowTitle}</p>
+      <div class="dossier-flow">{detail.steps.map((step, i) => <>{i > 0 && <span aria-hidden="true">&#8594;</span>}<span>{step}</span></>)}</div>
+      <figcaption>{detail.caption}</figcaption>
+    </figure>
+    <div class="dossier-notes">
+      {detail.notes.map(note => <section><span class="dossier-eyebrow">{note.label}</span><h3>{note.title}</h3><p>{note.body}</p></section>)}
+    </div>
+    {project.eventUrl && <a class="dossier-repo" href={project.eventUrl} target="_blank" rel="noopener noreferrer">Visit the hackathon website &#8599;</a>}
+    {project.repo && <a class="dossier-repo" href={project.repo} target="_blank" rel="noopener noreferrer">Explore the repository ↗</a>}
+  </div>
+</dialog>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-open-dossier]').forEach(button => {
+    const dialog = document.getElementById(button.dataset.openDossier!) as HTMLDialogElement | null;
+    if (!dialog) return;
+    let previousOverflow = '';
+    button.addEventListener('click', () => {
+      previousOverflow = document.documentElement.style.overflow;
+      dialog.showModal();
+      document.documentElement.style.overflow = 'hidden';
+    });
+    dialog.querySelector('[data-close-dossier]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => {
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      document.documentElement.style.overflow = previousOverflow;
+      button.focus({ preventScroll: true });
+    });
+  });
+</script>

@@ -1,0 +1,56 @@
+---
+import PortfolioHero from '../components/PortfolioHero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectDossier from '../components/ProjectDossier.astro';
+import { featuredProjects, type Project, type ProjectDetail } from '../data/projects';
+import EducationSection from '../components/EducationSection.astro';
+import '../styles/index.css';
+import TestimonialCarousel from '../components/TestimonialCarousel.astro';
+const base = import.meta.env.BASE_URL;
+const personalHighlights = featuredProjects.filter(
+  (project): project is Project & { detail: ProjectDetail } =>
+    (project.category === 'personal' || project.category === 'hackathon') && project.detail !== undefined,
+);
+---
+<BaseLayout title="Aarron Loke — Data Scientist">
+  <PortfolioHero />
+
+  <main class="featured" aria-label="Featured work">
+    <div class="featured-inner">
+      <section class="background-grid" id="background" aria-label="Experiences and references">
+      <div class="lead-exp" data-reveal>
+        <h2 class="featured-title">Experiences</h2>
+        <p class="lead-exp__meta">Sembcorp · two internships · lead intern</p>
+        <p class="lead-exp__body">
+          I led the intern team on <em>Project&nbsp;Crystal</em>, a solar-irradiance forecasting
+          model I took end-to-end — EDA, ETL, feature selection, modelling. A strong
+          proof-of-concept got it adopted as a company initiative: the forecasts now help
+          Business&nbsp;Development answer customer solar-site questions and the O&amp;M team
+          schedule panel cleaning and maintenance.
+        </p>
+        <a href={`${base}/experience`} class="featured-more lead-exp__cta" data-reveal style="--d:1">
+          Full experiences <span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="references-section"><p class="section-label">IN THEIR WORDS</p><h2 class="references-title">People I&#8217;ve <em>worked with.</em></h2>
+      <TestimonialCarousel />
+      </div></section>
+
+<header class="featured-head" id="work" data-reveal>
+        <h2 class="featured-title">On my own time.</h2>
+        <p class="featured-note">Selected personal builds and hackathon work.</p>
+      </header>
+
+      <ol class="work-list">
+        {personalHighlights.map(project => <li><ProjectDossier project={project} detail={project.detail} /></li>)}
+      </ol>
+
+      <a href={`${base}/projects`} class="featured-more" data-reveal>
+        View all projects <span aria-hidden="true">→</span>
+      </a>
+
+      <EducationSection />
+    </div>
+  </main>
+
+</BaseLayout>

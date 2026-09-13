@@ -1,0 +1,107 @@
+---
+import { forecastLayers } from '../lib/forecastGeometry';
+const layers = forecastLayers(0);
+const layerDetails = [
+  { label: 'Observations', description: 'Individual measurements: the evidence a model learns from.' },
+  { label: 'Forecast', description: 'The model\u2019s estimate of the underlying pattern.' },
+  { label: 'Uncertainty', description: 'A range around the estimate, showing how much the outcome could vary.' },
+];
+---
+<figure class="forecast-object" data-mode="preview" aria-label="Illustrative forecast: observations, a prediction curve, and an uncertainty band separate on hover, keyboard focus, or tap.">
+  <button type="button" class="forecast-interaction" aria-label="Explore anatomy of a forecast" aria-controls="forecast-explorer" aria-haspopup="dialog" data-open-forecast>
+  <svg class="forecast-stage" viewBox="0 70 680 420" aria-hidden="true" fill="none">
+    {layers.map((layer, index) => (
+      <g data-layer={index}>
+        <polygon class={`forecast-plane plane-${index}`} points={layer.plane} />
+        <text class="plane-label" x={layer.label.x} y={layer.label.y}>{layerDetails[index].label.toUpperCase()}</text>
+        {index === 0 && <>
+          {layer.grid.map(points => <polyline class="plot-grid" points={points} />)}
+          {layer.dots.map(point => <circle class="observation" cx={point.x} cy={point.y} r="3.2" />)}
+        </>}
+        {index === 1 && <polyline class="forecast-line" pathLength="1" points={layer.line} />}
+        {index === 2 && <><polygon class="forecast-band" points={layer.band} /><polyline class="forecast-center" points={layer.line} /></>}
+      </g>
+    ))}
+  </svg>
+  <span class="forecast-heading"><span>ANATOMY OF A FORECAST</span><svg class="forecast-expand" viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4" /></svg></span>
+  </button>
+</figure>
+<style>
+  .forecast-object { position: relative; min-width: 0; width: 100%; }
+  .forecast-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 44px; margin-top: .5rem; font: 400 var(--text-meta)/1.6 var(--font-mono); letter-spacing: .06em; color: var(--color-text-secondary); }
+  .forecast-heading > span { grid-column: 2; }
+  .forecast-expand { justify-self: start; width: 20px; height: 20px; margin-left: .65rem; stroke: var(--color-accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .forecast-interaction:is(:hover, :focus-visible) .forecast-heading { color: var(--color-accent); }
+  .forecast-interaction:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+  .forecast-interaction { display: block; width: 100%; padding: 0; background: transparent; cursor: pointer; color: inherit; touch-action: pan-y; user-select: none; }
+  .forecast-stage { display: block; width: 100%; height: auto; overflow: visible; }
+  .forecast-plane { stroke: #A5AD9770; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .plane-0 { fill: #22291F; }
+  .plane-1 { fill: #28302580; }
+  .plane-2 { fill: #30282055; stroke: #D7A18499; }
+  .plane-label { font: 11px var(--font-mono); letter-spacing: .6px; fill: #F1E9DB; }
+  .plot-grid { stroke: #AAB59A; stroke-width: .7; opacity: .27; vector-effect: non-scaling-stroke; }
+  .observation { fill: #F1E9DB; }
+  .forecast-line { stroke: #E7B390; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .forecast-band { fill: #D7A184; fill-opacity: .22; stroke: #E7B390; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .forecast-center { stroke: #E7B390; stroke-width: 1; stroke-dasharray: 4 6; vector-effect: non-scaling-stroke; }
+  [data-layer] { opacity: var(--intro-opacity, 1); transition: opacity .35s ease; }
+  @media(max-width: 767px) { .forecast-heading { font-size: var(--text-meta); } .plane-label { font-size: 14px; letter-spacing: 0; } }
+  @media(prefers-reduced-motion: reduce) { [data-layer] { transition: none; } }</style>
+<script>
+  import { forecastLayers } from '../lib/forecastGeometry';
+  const object = document.querySelector<HTMLElement>('.forecast-object')!;
+  const interaction = object.querySelector<HTMLButtonElement>('.forecast-interaction')!;
+  const dialog = document.querySelector<HTMLDialogElement>('#forecast-explorer');
+  const groups = Array.from(object.querySelectorAll<SVGGElement>('[data-layer]')).map(group => ({
+    element: group, plane: group.querySelector('.forecast-plane')!, label: group.querySelector('.plane-label')!,
+    line: group.querySelector('.forecast-line, .forecast-center'), band: group.querySelector('.forecast-band'),
+    grid: Array.from(group.querySelectorAll('.plot-grid')), dots: Array.from(group.querySelectorAll<SVGCircleElement>('.observation')),
+  }));
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const curve = object.querySelector<SVGPolylineElement>('.forecast-line')!;
+  let intro = motion.matches ? 3000 : 0;
+  let frame = 0, previous = 0, elapsed = 0, separation = 0;
+  let visible = false, hovering = false, focused = false;
+  const progress = (start: number, duration: number) => Math.max(0, Math.min(1, (intro-start)/duration));
+  function paintIntro() {
+    groups[1].element.style.setProperty('--intro-opacity', String(progress(650,350)));
+    groups[2].element.style.setProperty('--intro-opacity', String(progress(1850,900)));
+    groups[0].dots.forEach((dot,i) => { dot.style.opacity = String(progress(i*18,240)); });
+    const drawn = progress(800,1000);
+    curve.style.strokeDasharray = drawn < 1 ? '1' : 'none';
+    curve.style.strokeDashoffset = String(1-drawn);
+  }
+  function render(time: number) {
+    frame = 0;
+    if (!visible || document.hidden || dialog?.open) return;
+    const delta = previous ? Math.min(time-previous,50) : 0;
+    previous = time;
+    if (!motion.matches) elapsed += delta;
+    if (intro < 3000) { intro = Math.min(3000,intro+delta); paintIntro(); }
+    const target = hovering || focused ? 1 : 0;
+    separation = motion.matches ? target : separation + (target-separation)*(1-Math.exp(-delta/240));
+    const yaw = motion.matches ? 0 : Math.sin(elapsed/7000)*.1;
+    object.dataset.separation = separation.toFixed(3);
+    forecastLayers(separation,yaw).forEach((layer,index) => {
+      const group = groups[index];
+      group.plane.setAttribute('points',layer.plane);
+      group.label.setAttribute('x',String(layer.label.x)); group.label.setAttribute('y',String(layer.label.y));
+      group.line?.setAttribute('points',layer.line); group.band?.setAttribute('points',layer.band);
+      group.grid.forEach((line,i) => line.setAttribute('points',layer.grid[i]));
+      group.dots.forEach((dot,i) => { dot.setAttribute('cx',String(layer.dots[i].x)); dot.setAttribute('cy',String(layer.dots[i].y)); });
+    });
+    if (!motion.matches) frame = requestAnimationFrame(render);
+  }
+  function schedule() { cancelAnimationFrame(frame); previous = 0; frame = requestAnimationFrame(render); }
+  function interact() { intro = 3000; paintIntro(); schedule(); }
+  interaction.addEventListener('pointerenter', e => { hovering = e.pointerType !== 'touch'; interact(); });
+  interaction.addEventListener('pointerleave', () => { hovering = false; interact(); });
+  interaction.addEventListener('focus', () => { focused = interaction.matches(':focus-visible'); interact(); });
+  interaction.addEventListener('blur', () => { focused = false; interact(); });
+  motion.addEventListener('change', interact);
+  document.addEventListener('visibilitychange',schedule);
+  dialog?.addEventListener('close',schedule);
+  new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; schedule(); }).observe(object);
+  paintIntro();
+</script>

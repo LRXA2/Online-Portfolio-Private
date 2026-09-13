@@ -1,0 +1,81 @@
+/* Semantic assignments shared by every page. Token values live in global.css. */
+body :is(.lead-exp__body, .featured-note, .work-blurb, .row-blurb,
+  .proj-hero__intro, .role__desc, .role__ref-body p, .dialog-summary,
+  .dossier-cover__body p:not(.dossier-eyebrow), .dossier-notes p,
+  .dossier-recognition p, .dossier-gallery-section > p,
+  .retrieval-visual p:not(.dossier-eyebrow), .dossier-placeholder figcaption,
+  .dossier-gallery figcaption, .edu-degree, .edu-school, .cert-name) {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  letter-spacing: normal;
+}
+body .background-grid .lead-exp__body,
+body .featured .featured-note,
+body .proj-shell .row-blurb,
+body .featured .edu-degree,
+body .featured .cert-name {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+body :is(.dossier-cover h3, .dossier-notes h3, .dossier-recognition h3,
+  .dossier-gallery-section h3, .retrieval-visual h3, .proj-shell .row-name,
+  .edu-institution) {
+  font: 400 var(--text-title)/1.2 var(--font-display);
+  letter-spacing: -.02em;
+}
+body :is(.featured .featured-title, .edu-title, .references-title,
+  .proj-shell .section-head__kicker, .company__name) {
+  font: 400 var(--text-section)/1.2 var(--font-display);
+  letter-spacing: -.02em;
+}
+body :is(.proj-hero .proj-hero__title, .exp-hero .exp-hero__title, .dialog-content h2) {
+  font: 400 var(--text-page)/1.15 var(--font-display);
+  letter-spacing: -.04em;
+  text-wrap: balance;
+}
+body :is(.proj-hero__title, .exp-hero__title) { margin: 0 0 1.5rem; }
+body :is(.dossier-actions button, .dossier-actions a, .proj-shell .row-dossier,
+  .featured-more, .dialog-toolbar button, .role__ref-close) {
+  font: 500 var(--text-ui)/1.6 var(--font-body);
+  letter-spacing: normal;
+}
+body :is(.dossier-eyebrow) { font-size: var(--text-meta); line-height: 1.6; }
+/* Long descriptions and labels wrap naturally as text grows. */
+body :is(.proj-row, .dossier-cover, .references-section, .role__detail) { min-width: 0; overflow-wrap: anywhere; }
+body .proj-shell .row-meta { flex-wrap: wrap; }
+body :is(.edu-org, .retrieval-input, .retrieval-stages p, .retrieval-branches p, .retrieval-example li) {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+body :is(.portfolio-hero__eyebrow, .edu-meta, .edu-col-label, .cert-year, .exp-hero__stat) {
+  font-size: var(--text-meta);
+  line-height: 1.6;
+}
+
+/* Page labels share one treatment; section labels use the same scale in copper. */
+body :is(.portfolio-hero__eyebrow, .proj-hero__kicker, .exp-hero__kicker) {
+  display: block;
+  font: 400 var(--text-meta)/1.6 var(--font-mono);
+  letter-spacing: .12em;
+  color: var(--color-text-secondary);
+  opacity: 1;
+  margin: 0 0 1.5rem;
+}
+body .exp-hero__kicker::before { content: none; }
+body :is(.section-label, .edu .edu-kicker, .edu .edu-col-label, .role__ref-kicker, .dossier-eyebrow) {
+  font: 400 var(--text-meta)/1.6 var(--font-mono);
+  letter-spacing: .12em;
+}
+body :is(.lead-exp__meta, .role__dates, .exp-hero__stat, .row-year,
+  .row-stack li, .proj__stack, .section-head__sub, .section-head__count, .edu-meta) {
+  font: 400 var(--text-meta)/1.6 var(--font-mono);
+  letter-spacing: .04em;
+}
+body .role__title {
+  font: 500 var(--text-body)/1.6 var(--font-body);
+  letter-spacing: normal;
+}
+body .role__ref-author { font: 600 var(--text-ui)/1.5 var(--font-body); }

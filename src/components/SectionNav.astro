@@ -1,0 +1,55 @@
+---
+interface Props {
+  items: { id: string; label: string }[];
+  label: string;
+}
+const { items, label } = Astro.props;
+---
+<nav class="section-nav" aria-label={label}>
+  {items.map(item => <a href={`#${item.id}`}>{item.label}</a>)}
+</nav>
+
+<style>
+  .section-nav { display: flex; position: sticky; top: var(--navbar-height); z-index: 5; gap: 2rem; overflow-x: auto; padding: 1.2rem 0; background: var(--color-bg-primary); border-bottom: 1px solid var(--line); scrollbar-width: thin; scrollbar-color: var(--color-accent) transparent; }
+  .section-nav a { flex-shrink: 0; color: var(--color-text-secondary); font: 500 var(--text-ui)/1.6 var(--font-body); letter-spacing: normal; word-spacing: normal; white-space: nowrap; text-decoration: none; }
+  .section-nav a:hover, .section-nav a[aria-current] { color: var(--color-accent); }
+  .section-nav a[aria-current] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .5rem; }
+  .section-nav a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+  :global(html:has(.section-nav)) { scroll-behavior: smooth; }
+  @media (max-width: 767px) { .section-nav { gap: 1.5rem; } }
+  @media (prefers-reduced-motion: reduce) { :global(html:has(.section-nav)) { scroll-behavior: auto; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.section-nav').forEach(nav => {
+    const entries = Array.from(nav.querySelectorAll<HTMLAnchorElement>('a')).flatMap(link => {
+      const section = document.getElementById(link.hash.slice(1));
+      return section ? [{ link, section }] : [];
+    });
+    let frame = 0;
+    function update() {
+      frame = 0;
+      const threshold = parseFloat(getComputedStyle(nav).top) + nav.offsetHeight + 24;
+      let active = entries[0];
+      for (const entry of entries) {
+        if (entry.section.getBoundingClientRect().top <= threshold) active = entry;
+      }
+      // The final section may be too short to reach the sticky bar.
+      if (scrollY > 0 && scrollY + innerHeight >= document.documentElement.scrollHeight - 2) {
+        active = entries.at(-1) ?? active;
+      }
+      entries.forEach(entry => {
+        if (entry === active) entry.link.setAttribute('aria-current', 'location');
+        else entry.link.removeAttribute('aria-current');
+      });
+    }
+    function schedule() { if (!frame) frame = requestAnimationFrame(update); }
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    window.addEventListener('pageshow', schedule);
+    // Expanded reference letters change section positions without a resize event.
+    const observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+    update();
+  });
+</script>

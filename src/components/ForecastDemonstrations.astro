@@ -1,0 +1,99 @@
+---
+import NeuralTraining from './NeuralTraining.astro';
+import { engineeringExample } from '../lib/observationEngineering';
+const example=engineeringExample();
+const samples=example.prepared.map((value,i)=>({x:65+i/23*770,y:300-value*2.8}));
+const observedPath=samples.map((p,i)=>example.readings[i]===null?'':`${i===0||example.readings[i-1]===null?'M':'L'}${p.x} ${p.y}`).join(' ');
+const featureRows=example.rows.filter(row=>[3,4,6].includes(row.hour));
+const bins=Array.from({length:9},(_,i)=>example.readings.filter(value=>value!==null&&Math.floor(value/10)===i).length);
+const center = Array.from({length:49},(_,i)=>({x:65+i/48*770,y:230-85*Math.sin(i/48*Math.PI)}));
+const curves = Array.from({length:11},(_,j)=>center.map((p,i)=>({x:p.x,y:p.y+(j-5)*5*(.2+i/48)+Math.sin(i/7+j)*9*i/48})));
+const points = (ps:{x:number;y:number}[])=>ps.map(p=>`${p.x},${p.y}`).join(' ');
+const envelope = [...center.map((p,i)=>({x:p.x,y:Math.min(...curves.map(c=>c[i].y))})),...center.map((p,i)=>({x:p.x,y:Math.max(...curves.map(c=>c[i].y))})).reverse()];
+---
+<div class="forecast-demonstrations">
+  <section data-demo="observations" aria-label="Observations animation" hidden>
+    <ol class="engineering-stages" aria-label="Data preparation stages">{['Trend','Quality','Features'].map((label,index)=><li data-engineering-stage={index}>{label}</li>)}</ol>
+    <div class="visual-labels"><span>Hourly readings</span><span data-observation-view>Hourly series</span></div>
+    <div class="engineering-scene">
+      <div data-eda-chart>
+        <svg viewBox="0 0 900 370" role="img" aria-label="Hourly readings scanned for a missing reading and an unusual value">
+          <g class="chart-grid">{[100,180,260,340].map(y=><path d={`M65 ${y}H835`} />)}</g>
+                    <rect data-feature-window class="feature-window" x="45" y="55" width="107" height="285" />
+          <polyline data-trend class="trend-line" points={samples.map((p,i)=>`${p.x},${300-example.prepared.slice(Math.max(0,i-2),i+1).reduce((a,b)=>a+b,0)/Math.min(i+1,3)*2.8}`).join(' ')} pathLength="1" />
+          <path data-observation-line class="observation-line" d={observedPath} pathLength="1" />
+          {samples.map((p,i)=><circle data-reading={i} data-x={p.x} data-y={p.y} class="reading" cx={p.x} cy={p.y} r="6" />)}
+          <g data-eda-flags>
+            <circle class="gap-ring" cx={samples[5].x} cy={samples[5].y} r="13" /><text class="eda-label" x={samples[5].x} y={samples[5].y+35} text-anchor="middle">Gap</text>
+            <circle class="review-ring" cx={samples[10].x} cy={samples[10].y} r="15" /><text class="eda-label review-label" x={samples[10].x+24} y={samples[10].y+6}>Review</text>
+          </g>
+          <line data-eda-scan class="eda-scan" x1="65" x2="65" y1="55" y2="340" />
+          <path class="chart-axis" d="M65 65V340H835" />
+        </svg>
+        <div class="eda-summary" data-eda-summary><div><span>Missing</span><strong>1</strong></div><div><span>Flagged</span><strong>1</strong></div><div><span>Distribution</span><svg viewBox="0 0 150 65" aria-label="Histogram of observed values" role="img">{bins.map((count,i)=><rect data-bin x={i*16+2} y={60-count*8} width="11" height={count*8} />)}</svg></div></div>
+      </div>
+      <div data-feature-matrix class="feature-matrix" aria-hidden="true">
+        <div class="feature-calculation" data-feature-calculation aria-label="Rolling mean calculation"></div><div class="feature-flow"><span>Past readings</span><span aria-hidden="true">&#8594;</span><span>Model inputs</span><span aria-hidden="true">&#8594;</span><span>Target</span></div>
+        <table aria-label="Engineered features"><thead><tr><th scope="col">Hour</th><th scope="col">Lag 1</th><th scope="col">Mean 3</th><th scope="col">Target</th></tr></thead><tbody>{featureRows.map(row=><tr data-feature-row={row.hour}>{[row.hour,row.lag,row.mean,row.target].map((value,i)=><td style={`--heat:${.06+value/100*.32}`} class:list={{'feature-target':i===3}}>{i===2?value.toFixed(1):value}</td>)}</tr>)}</tbody></table>
+        <p class="feature-note">Past-only inputs &middot; gap carried forward &middot; flagged value retained</p>
+      </div>
+    </div>
+    <div class="visual-footer"><span data-observation-caption>Trend</span><span>Time &#8594;</span></div>
+  </section>
+  <section data-demo="forecast" aria-label="Forecast training animation" hidden><NeuralTraining /></section>
+  <section data-demo="uncertainty" aria-label="Uncertainty animation" hidden>
+    <div class="visual-labels"><span>One estimate</span><span>Many possibilities</span></div>
+    <svg viewBox="0 0 900 370" role="img" aria-label="Plausible prediction curves spread around an estimate and form an illustrative uncertainty band">
+      <g class="chart-grid">{[100,180,260,340].map(y=><path d={`M65 ${y}H835`} />)}</g>
+      <polygon data-envelope class="envelope" points={points(envelope)} />
+      {curves.map((curve,index)=><polyline data-possibility={index} class="possibility" points={points(curve)} pathLength="1" />)}
+      <polyline class="central-estimate" data-central-estimate points={points(center)} pathLength="1" />
+      <path class="chart-axis" d="M65 65V340H835" />
+    </svg>
+    <div class="visual-footer"><span>Illustrative range</span><span>Time &#8594;</span></div>
+  </section>
+</div>
+<style>
+  [hidden] { display: none !important; }
+  svg { display: block; width: 100%; height: auto; max-height: 420px; }
+  .visual-labels, .visual-footer { display: flex; justify-content: space-between; gap: 1rem; font: var(--text-ui)/1.6 var(--font-mono); color: var(--color-text-secondary); }
+  .visual-labels { padding: .5rem 0 1rem; }
+  .visual-footer { padding: 1rem 0; border-top: 1px solid var(--line); }
+  .chart-grid path { stroke: var(--line); stroke-width: 1; opacity: .5; }
+  .chart-axis { fill: none; stroke: #858b7e; stroke-width: 1; }
+  .reading { fill: var(--color-accent); }
+  .observation-line { fill: none; stroke: #a9be9b; stroke-width: 2; }
+  .possibility { fill: none; stroke: #b2c2a4; stroke-width: 1.5; }
+  .central-estimate { fill: none; stroke: var(--color-accent); stroke-width: 3; }
+  .envelope { fill: #d7a18440; stroke: var(--color-accent); stroke-width: 1; }
+  .engineering-stages { list-style: none; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin: 0 0 1.25rem; padding: 0; border-bottom: 1px solid var(--line); font: var(--text-ui)/1.6 var(--font-mono); color: var(--color-text-secondary); }
+  .engineering-stages li { padding: .65rem 0; border-bottom: 2px solid transparent; }
+  .engineering-stages li.is-active { color: var(--color-accent); border-color: var(--color-accent); }
+  .engineering-scene { display: grid; gap: 1rem; }
+  @media(min-width: 900px) { .engineering-scene { grid-template-columns: 1.1fr 1fr; align-items: start; gap: 2rem; } }
+  .engineering-scene > div { min-width: 0; }
+  .feature-window { fill: #a9be9b20; stroke: #a9be9b; stroke-width: 2; stroke-dasharray: 6 4; }
+  .trend-line { fill: none; stroke: var(--color-accent); stroke-width: 5; }
+  .feature-calculation { min-height: 3.5rem; font: var(--text-body)/1.7 var(--font-mono); color: #a9be9b; text-align: center; overflow-wrap: anywhere; }
+  .feature-matrix { visibility: hidden; opacity: 0; align-self: center; padding: 1rem 0; }
+  .feature-flow { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: 1.5rem; font: var(--text-ui)/1.6 var(--font-mono); color: var(--color-accent); }
+  table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 5px; font: var(--text-ui)/1.6 var(--font-mono); }
+  th { text-align: center; font-weight: 400; color: var(--color-text-secondary); padding: .4rem 0; }
+  td { text-align: center; padding: .7rem .2rem; background: rgb(169 190 155 / var(--heat)); color: var(--color-text-primary); }
+  tr.is-current td { outline: 1px solid #a9be9b; outline-offset: -1px; }
+  td.feature-target { background: rgb(215 161 132 / var(--heat)); color: var(--color-accent); }
+  .feature-note { font: var(--text-body)/1.7 var(--font-body); color: var(--color-text-secondary); text-align: center; margin: 1rem 0 0; }
+  .eda-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; padding: 0 0 1rem; }
+  .eda-summary > div { border-top: 1px solid var(--line); padding-top: .7rem; }
+  .eda-summary span { font: var(--text-ui)/1.6 var(--font-mono); color: var(--color-text-secondary); }
+  .eda-summary strong { display: block; font: 400 var(--text-section)/1.2 var(--font-display); color: var(--color-accent); }
+  .eda-summary svg { height: 55px; width: 100%; }
+  .eda-summary rect { fill: #a9be9b; }
+  .gap-ring { fill: none; stroke: #a9be9b; stroke-width: 2; stroke-dasharray: 4 4; }
+  .review-ring { fill: #d7a18420; stroke: var(--color-accent); stroke-width: 2; }
+  .eda-label { fill: #a9be9b; font: 32px var(--font-mono); }
+  .review-label { fill: var(--color-accent); }
+  .eda-scan { stroke: var(--color-accent); stroke-width: 2; opacity: .7; filter: drop-shadow(0 0 5px #d7a184); }
+  @media(max-width: 500px) { .engineering-stages { font-family: var(--font-body); column-gap: .5rem; } .eda-label { font-size: 56px; } .feature-flow { font-family: var(--font-body); } .eda-summary { gap: .5rem; } .eda-summary span { font-family: var(--font-body); } table { border-spacing: 3px; } }
+</style>
+

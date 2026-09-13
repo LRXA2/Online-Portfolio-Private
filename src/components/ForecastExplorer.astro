@@ -1,0 +1,146 @@
+---
+import { forecastLayers } from '../lib/forecastGeometry';
+import { demonstrationLayers } from '../lib/forecastDemonstrations';
+import ForecastDemonstrations from './ForecastDemonstrations.astro';
+const layers = forecastLayers(1);
+---
+<dialog id="forecast-explorer" class="forecast-explorer" aria-labelledby="explorer-title">
+  <header class="explorer-header"><div><h2 id="explorer-title">Anatomy of a forecast</h2><span>Interactive illustration</span></div><button type="button" class="explorer-close" aria-label="Close forecast explorer" autofocus>Close <span aria-hidden="true">&#215;</span></button></header>
+  <div class="explorer-body">
+    <div class="layer-overview">
+      <div class="layer-diagram" role="group" aria-label="Select a forecast layer">
+        {layers.map((layer,index)=><button type="button" class="layer-choice" data-layer-choice={demonstrationLayers[index].id} aria-label={demonstrationLayers[index].label} aria-pressed="false" aria-controls="layer-demonstration">
+          <svg viewBox="0 0 900 475" preserveAspectRatio="none" fill="none" aria-hidden="true">
+            <polygon class={`layer-plane layer-plane-${index}`} points={layer.plane} />
+            {index===0 && <>{layer.grid.map(points=><polyline class="layer-grid" points={points} />)}{layer.dots.map(p=><circle class="layer-dot" cx={p.x} cy={p.y} r="3.2" />)}</>}
+            {index===1 && <polyline class="layer-curve" points={layer.line} />}
+            {index===2 && <><polygon class="layer-band" points={layer.band} /><polyline class="layer-center" points={layer.line} /></>}
+            <path class="layer-leader" d={`M620 ${layer.label.y+24}H650`} />
+          </svg>
+          <span class="layer-caption" style={`--label-top:${(layer.label.y+24)/475*100}%`}>{demonstrationLayers[index].label}<span aria-hidden="true">&#8595;</span></span>
+        </button>)}
+      </div>
+      <p class="layer-instruction">Select a layer to see it in motion.</p>
+    </div>
+    <section id="layer-demonstration" class="layer-demonstration" aria-labelledby="demonstration-title" hidden>
+      <div class="demonstration-header"><div><h3 id="demonstration-title" tabindex="-1">Observations</h3><p data-animation-phase></p></div><button type="button" class="animation-toggle" data-animation-toggle>Pause</button></div>
+      <ForecastDemonstrations />
+      <p class="illustration-note">Illustrative data &middot; educational model</p>
+    </section>
+  </div>
+</dialog>
+<style>
+  .forecast-explorer { width: min(1180px,calc(100% - 3rem)); max-width: none; height: calc(100dvh - 3rem); max-height: calc(100dvh - 3rem); margin: auto; padding: 0; border: 1px solid var(--line); color: var(--color-text-primary); background: var(--color-bg-primary); overscroll-behavior: contain; overflow-anchor: none; }
+  .forecast-explorer[open] { animation: explorer-expand 420ms cubic-bezier(.22,1,.36,1) both; }
+  .forecast-explorer[open]::backdrop { animation: explorer-backdrop 420ms ease-out both; }
+  @keyframes explorer-expand { from { opacity: 0; transform: translateY(20px) scale(.94); } to { opacity: 1; transform: none; } }
+  @keyframes explorer-backdrop { from { opacity: 0; } to { opacity: 1; } }
+  @media(prefers-reduced-motion: reduce) { .forecast-explorer[open], .forecast-explorer[open]::backdrop { animation: none; } }
+  .forecast-explorer::backdrop { background: #080b09e0; backdrop-filter: blur(10px); }
+  [hidden] { display: none !important; }
+  button { cursor: pointer; color: inherit; background: transparent; font: var(--text-ui)/1.6 var(--font-mono); }
+  .explorer-header { position: sticky; top: 0; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 2rem; border-bottom: 1px solid var(--line); background: var(--color-bg-primary); }
+  .explorer-header h2 { font: 400 var(--text-title)/1.2 var(--font-display); margin: 0; }
+  .explorer-header > div > span { font: var(--text-meta)/1.6 var(--font-mono); color: var(--color-text-secondary); }
+  .explorer-close { padding: .6rem .8rem; border: 1px solid var(--line); flex-shrink: 0; }
+  .explorer-close:hover { border-color: var(--color-accent); }
+  .explorer-body { padding: 0 2rem 1rem; }
+  .layer-overview { background: var(--color-bg-primary); border-bottom: 1px solid var(--line); }
+  .layer-diagram { position: relative; height: clamp(340px,48vh,470px); background: radial-gradient(ellipse at 38% 50%,#d7a1840e,transparent 68%); }
+
+  .layer-choice { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; pointer-events: none; }
+  .layer-choice svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .layer-plane { pointer-events: all; stroke: #a5ad9790; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .layer-plane-0 { fill: #242b20; }.layer-plane-1 { fill: #2e3529d9; }.layer-plane-2 { fill: #382f27d9; }
+  .layer-choice:hover .layer-plane, .layer-choice[aria-pressed="true"] .layer-plane, .layer-choice:focus-visible .layer-plane { stroke: var(--color-accent); stroke-width: 2; }
+  .layer-choice[aria-pressed="true"] .layer-plane { fill: #453729e8; }
+  .layer-choice:focus-visible { outline: none; }
+  .layer-choice:focus-visible .layer-caption { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  .layer-grid { stroke: #a5ad97; opacity: .2; stroke-width: .7; }
+  .layer-dot { fill: #ede5d8; }.layer-curve { stroke: #e7b390; stroke-width: 2.5; }
+  .layer-band { fill: #d7a18440; stroke: var(--color-accent); stroke-width: 1; }.layer-center { stroke: var(--color-accent); stroke-dasharray: 4 6; }
+  .layer-leader { stroke: #a5ad9770; stroke-width: 1; }
+  .layer-caption { position: absolute; left: 73%; right: 0; top: var(--label-top); transform: translateY(-50%); min-height: 44px; display: flex; align-items: center; justify-content: space-between; padding: .4rem .6rem; text-align: left; pointer-events: auto; color: var(--color-text-secondary); }
+  .layer-caption span { color: var(--color-accent); margin-left: .5rem; }
+  .layer-choice[aria-pressed="true"] .layer-caption { color: var(--color-accent); border-bottom: 2px solid var(--color-accent); }
+  .layer-instruction { margin: 0; padding: 0 0 1rem; text-align: center; font: var(--text-ui)/1.6 var(--font-body); color: var(--color-text-secondary); }
+  .forecast-explorer[data-selected] .layer-instruction { visibility: hidden; }
+  .demonstration-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.5rem 0 1rem; }
+  .demonstration-header h3 { margin: 0; font: 400 var(--text-title)/1.2 var(--font-display); }
+  [data-animation-phase] { margin: .4rem 0 0; font: var(--text-ui)/1.6 var(--font-mono); color: var(--color-accent); }
+  .animation-toggle { padding: .6rem 1rem; border: 1px solid var(--line); min-width: 6rem; }
+  .animation-toggle:hover { border-color: var(--color-accent); }
+  .illustration-note { margin: 1rem 0 0; text-align: right; font: var(--text-meta)/1.6 var(--font-mono); color: var(--color-text-secondary); }
+  @media(max-width: 600px) { .forecast-explorer { width: calc(100% - 1rem); height: calc(100dvh - 1rem); max-height: calc(100dvh - 1rem); } .explorer-header { padding: .8rem 1rem; } .explorer-header h2 { font-size: var(--text-lead); } .explorer-body { padding: 0 1rem 1rem; } .layer-choice svg { width: 88%; } .layer-caption { left: 65%; padding: .3rem 0; font: var(--text-ui)/1.5 var(--font-body); } .layer-caption span { display: none; } .layer-diagram { height: 340px; } }
+  .layer-demonstration { min-height: calc(100dvh - var(--explorer-header-height,90px) - 5rem); }
+</style>
+<script>
+  import { createDemonstration, demonstrationLayers, type DemonstrationLayer } from '../lib/forecastDemonstrations';
+  const dialog=document.querySelector<HTMLDialogElement>('#forecast-explorer')!;
+  const choices=Array.from(dialog.querySelectorAll<HTMLButtonElement>('[data-layer-choice]'));
+  const demonstration=dialog.querySelector<HTMLElement>('.layer-demonstration')!;
+  const phase=dialog.querySelector<HTMLElement>('[data-animation-phase]')!;
+  const title=dialog.querySelector<HTMLElement>('#demonstration-title')!;
+  const toggle=dialog.querySelector<HTMLButtonElement>('[data-animation-toggle]')!;
+  const renderer=createDemonstration(dialog.querySelector<HTMLElement>('.forecast-demonstrations')!,phase);
+  const motion=matchMedia('(prefers-reduced-motion: reduce)');
+  let scrollFrame=0;
+  function stopScroll(){cancelAnimationFrame(scrollFrame);scrollFrame=0;}
+  function scrollToDemonstration(top:number){
+    stopScroll();
+    if(motion.matches){dialog.scrollTo({top,behavior:'instant'});return;}
+    const from=dialog.scrollTop;
+    let start:number|null=null;
+    const step=(now:number)=>{
+      start??=now;
+      const progress=Math.min(1,(now-start)/650);
+      const eased=progress*progress*(3-2*progress);
+      dialog.scrollTo({top:from+(top-from)*eased,behavior:'instant'});
+      scrollFrame=progress<1&&dialog.open?requestAnimationFrame(step):0;
+    };
+    scrollFrame=requestAnimationFrame(step);
+  }
+  dialog.addEventListener('wheel',stopScroll,{passive:true});
+  dialog.addEventListener('touchstart',stopScroll,{passive:true});
+  let selected: DemonstrationLayer|null=null;
+  let paused=false, elapsed=0, previous=0, frame=0;
+  let opener: HTMLButtonElement|null=null, previousOverflow='';
+  function draw(time:number) {
+    frame=0;
+    if(!dialog.open||document.hidden||paused||!selected)return;
+    if(previous)elapsed+=Math.min(time-previous,64);
+    previous=time;renderer.render(elapsed);frame=requestAnimationFrame(draw);
+  }
+  function schedule() {
+    cancelAnimationFrame(frame);frame=0;previous=0;
+    toggle.textContent=paused?'Play':'Pause';
+    if(dialog.open&&!document.hidden&&!paused&&selected)frame=requestAnimationFrame(draw);
+  }
+  function select(layer: DemonstrationLayer|null) {
+    stopScroll();selected=layer;elapsed=0;paused=motion.matches;
+    if(layer)dialog.dataset.selected=layer;else delete dialog.dataset.selected;
+    choices.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.layerChoice===layer)));
+    renderer.select(layer);demonstration.hidden=layer===null;
+    if(layer){title.textContent=demonstrationLayers.find(item=>item.id===layer)!.label;elapsed=motion.matches?(layer==='forecast'?13200:layer==='observations'?13000:6500):0;renderer.render(elapsed);}
+    if(layer){
+      title.focus({preventScroll:true});
+      const top=demonstration.getBoundingClientRect().top-dialog.getBoundingClientRect().top+dialog.scrollTop-header.offsetHeight-dialog.clientTop;
+      scrollToDemonstration(top);
+    }else dialog.scrollTo({top:0,behavior:'instant'});
+    schedule();
+  }
+  choices.forEach(button=>button.addEventListener('click',()=>select(button.dataset.layerChoice as DemonstrationLayer)));
+  toggle.addEventListener('click',()=>{paused=!paused;schedule();});
+  const header=dialog.querySelector<HTMLElement>('.explorer-header')!;
+  new ResizeObserver(()=>dialog.style.setProperty('--explorer-header-height',`${header.offsetHeight}px`)).observe(header);
+  document.querySelectorAll<HTMLButtonElement>('[data-open-forecast]').forEach(button=>button.addEventListener('click',()=>{
+    opener=button;previousOverflow=document.documentElement.style.overflow;
+    select(null);dialog.showModal();document.documentElement.style.overflow='hidden';
+    dialog.querySelector<HTMLButtonElement>('.explorer-close')!.focus();
+  }));
+  dialog.querySelector('.explorer-close')!.addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('close',()=>{stopScroll();schedule();document.documentElement.style.overflow=previousOverflow;opener?.focus({preventScroll:true});});
+  dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();});
+  document.addEventListener('visibilitychange',schedule);
+  motion.addEventListener('change',()=>{if(motion.matches){stopScroll();paused=true;if(selected){elapsed=selected==='forecast'?13200:selected==='observations'?13000:6500;renderer.render(elapsed);}}schedule();});
+</script>

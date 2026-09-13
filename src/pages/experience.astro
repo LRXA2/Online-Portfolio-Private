@@ -1,0 +1,238 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionNav from '../components/SectionNav.astro';
+import { projectData } from '../data/projects.ts';
+import { testimonials } from '../data/testimonials';
+import '../styles/experience.css';
+
+// Stacks are canonical — pull from projects.ts so they match the projects page.
+const stackOf = (slug: string) => projectData.find((p) => p.slug === slug)?.stack ?? [];
+
+type Role = {
+  ord: string;
+  companyId: string;
+  startDate: string;
+  dates: string;
+  org: string;
+  team: string;
+  title: string;
+  desc: string;
+  projects: { name: string; slug: string; note?: string }[];
+  refs?: number[]; // indices into testimonials
+};
+
+const roles: Role[] = [
+  {
+    ord: '01',
+    companyId: 'sembcorp',
+    startDate: '2025-03-01',
+    dates: 'MAR 2025 — JUL 2025',
+    org: 'Sembcorp',
+    team: 'Sembsolar OPM',
+    title: 'Data Science Intern · Continuation',
+    desc: 'Solar operational performance — roof detection and Crystal in production.',
+    projects: [
+      { name: 'Solarizable Roof Detection', slug: 'solarizable-roof-detection' },
+      { name: 'Project Crystal', slug: 'project-crystal', note: 'Phase 2' },
+    ],
+    refs: [0],
+  },
+  {
+    ord: '02',
+    companyId: 'sembcorp',
+    startDate: '2024-03-01',
+    dates: 'MAR 2024 — JAN 2025',
+    org: 'Sembcorp',
+    team: 'Group Digital',
+    title: 'Data Science Intern',
+    desc: 'Energy forecasting and geospatial analytics for BD and O&M.',
+    projects: [
+      { name: 'Project Crystal', slug: 'project-crystal', note: 'Phase 1' },
+      { name: 'Forecast Model Evaluation', slug: 'forecast-model-evaluation' },
+      { name: 'Pangu Weather Experiment', slug: 'pangu-weather' },
+      { name: 'Grafana → KQL Migration', slug: 'grafana-kql-migration' },
+    ],
+    refs: [1, 2],
+  },
+  {
+    ord: '03',
+    companyId: 'nus',
+    startDate: '2023-01-01',
+    dates: '2023',
+    org: 'NUS',
+    team: 'Department of Mathematics',
+    title: 'Process Automation · Power Automate',
+    desc: 'Digitised a manual staff-expense approval process with Power Automate — per-staff expense logs and balances, cutting repetitive tracking work for the department.',
+    projects: [
+      { name: 'NUS Math Dept Automation', slug: 'nus-math-automation' },
+    ],
+    refs: [3],
+  },
+];
+
+// Newest placement determines company order; stable IDs preserve company links.
+const companies = new Map<string, { id: string; label: string; roles: Role[] }>();
+for (const role of [...roles].sort((a, b) => b.startDate.localeCompare(a.startDate))) {
+  const company = companies.get(role.companyId);
+  if (company) company.roles.push(role);
+  else companies.set(role.companyId, { id: role.companyId, label: role.org, roles: [role] });
+}
+const companyGroups = Array.from(companies.values());
+---
+<BaseLayout title="Experiences — Aarron Loke">
+  <header class="exp-hero">
+    <div class="exp-hero__inner">
+      <span class="exp-hero__kicker">EXPERIENCES</span>
+      <h1 class="exp-hero__title" data-reveal>
+        Where data science<br />
+        meets <em>production.</em>
+      </h1>
+    </div>
+  </header>
+
+  <main class="exp-body">
+    <div class="experience-layout">
+      <SectionNav items={companyGroups} label="Jump to company" />
+      {companyGroups.map(company => (
+        <section class="company" id={company.id} aria-labelledby={`${company.id}-heading`}>
+          <h2 class="company__name" id={`${company.id}-heading`}>{company.label}</h2>
+          {company.roles.map((r) => (
+            <section class="role" id={`role-${r.ord}`}>
+              <div class="role__mark">
+                <span class="role__ord">{r.ord}</span>
+                <span class="role__dates">{r.dates}</span>
+              </div>
+              <div class="role__detail">
+                <header class="role__head">
+                  <h3 class="role__team">{r.team}</h3>
+                  <p class="role__title">{r.title}</p>
+                  <p class="role__desc">{r.desc}</p>
+                </header>
+                <ol class="role__projects">
+                  {r.projects.map((p) => (
+                    <li class="proj">
+                      <span class="proj__name">
+                        {p.name}{p.note && <span class="proj__note">{p.note}</span>}
+                      </span>
+                      <ul class="proj__stack">
+                        {stackOf(p.slug).map((t) => <li>{t}</li>)}
+                      </ul>
+                    </li>
+                  ))}
+                </ol>
+                {r.refs && r.refs.length > 0 && (
+                  <ul class="role__refs">
+                    {r.refs.map((ri) => (
+                      <li>
+                        <details class="role__ref" id={`ref-${ri}`}>
+                          <summary class="role__ref-summary">
+                            <span class="role__ref-kicker">REFERENCE</span>
+                            <span class="role__ref-by">
+                              <span class="role__ref-author">{testimonials[ri].author}</span>
+                              <span>{testimonials[ri].title}</span>
+                              {testimonials[ri].when && <span class="role__ref-when">{testimonials[ri].when}</span>}
+                            </span>
+                          </summary>
+                          <blockquote class="role__ref-body">
+                            {testimonials[ri].full?.map((p) => <p>{p}</p>)}
+                          </blockquote>
+                          <button class="role__ref-close" type="button" hidden>Collapse reference <span aria-hidden="true">&#8593;</span></button>
+                        </details>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </section>
+          ))}
+        </section>
+      ))}
+    </div>
+  </main>
+
+  <script>
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const returnPositions = new WeakMap<HTMLDetailsElement, number>();
+    let animation: { details: HTMLDetailsElement; open: boolean; cancel: () => void; finish: () => void } | undefined;
+
+    function setReference(details: HTMLDetailsElement, open: boolean) {
+      if (animation && animation.details !== details) animation.finish();
+      const interrupted = animation?.details === details;
+      const startHeight = details.getBoundingClientRect().height;
+      const startScroll = window.scrollY;
+      animation?.cancel();
+      if (!interrupted && details.open === open) return;
+      const summary = details.querySelector<HTMLElement>('summary')!;
+      if (open && !interrupted) returnPositions.set(details, startScroll);
+      const styles = getComputedStyle(details);
+      // Measure the real closed label; its longer text may wrap on mobile.
+      details.open = false;
+      const collapsedHeight = details.getBoundingClientRect().height;
+      const top = details.getBoundingClientRect().top + startScroll;
+      const targetScroll = open
+        ? Math.max(0, top - parseFloat(styles.scrollMarginTop))
+        : returnPositions.get(details) ?? Math.max(0, top - parseFloat(styles.scrollMarginTop));
+      details.open = true;
+      const expandedHeight = details.getBoundingClientRect().height;
+      const endHeight = open ? expandedHeight : collapsedHeight;
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - innerHeight - (expandedHeight - endHeight));
+      const endScroll = Math.min(targetScroll, maxScroll);
+      const root = document.documentElement;
+      const oldAnchor = root.style.overflowAnchor;
+      root.style.overflowAnchor = 'none';
+      details.style.overflow = 'hidden';
+      details.style.height = `${startHeight}px`;
+      let frameId = 0;
+      const cancel = () => {
+        cancelAnimationFrame(frameId);
+        details.style.removeProperty('height');
+        details.style.removeProperty('overflow');
+        root.style.overflowAnchor = oldAnchor;
+        animation = undefined;
+      };
+      const finish = () => {
+        if (!open && details.contains(document.activeElement)) summary.focus({ preventScroll: true });
+        details.open = open;
+        cancel();
+        window.scrollTo({ top: endScroll, behavior: 'instant' });
+      };
+      animation = { details, open, cancel, finish };
+      if (reducedMotion.matches) { finish(); return; }
+      const started = performance.now();
+      const tick = (now: number) => {
+        const progress = Math.min(1, (now - started) / 480);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        details.style.height = `${startHeight + (endHeight - startHeight) * eased}px`;
+        window.scrollTo({ top: startScroll + (endScroll - startScroll) * eased, behavior: 'instant' });
+        if (progress < 1) frameId = requestAnimationFrame(tick);
+        else finish();
+      };
+      frameId = requestAnimationFrame(tick);
+    }
+
+    document.querySelectorAll<HTMLDetailsElement>('.role__ref').forEach(details => {
+      const summary = details.querySelector<HTMLElement>('summary')!;
+      summary.addEventListener('click', event => {
+        event.preventDefault();
+        const open = animation?.details === details ? !animation.open : !details.open;
+        setReference(details, open);
+      });
+      const close = details.querySelector<HTMLButtonElement>('.role__ref-close')!;
+      close.hidden = false;
+      close.addEventListener('click', () => setReference(details, false));
+    });
+
+    function openLinkedReference() {
+      if (!/^#ref-\d+$/.test(location.hash)) return;
+      const details = document.querySelector<HTMLDetailsElement>(location.hash);
+      if (!details) return;
+      setReference(details, true);
+      // A deep link has no prior reading position on this page.
+      returnPositions.set(details, Math.max(0, details.getBoundingClientRect().top + scrollY
+        - parseFloat(getComputedStyle(details).scrollMarginTop)));
+    }
+    window.addEventListener('hashchange', openLinkedReference);
+    window.addEventListener('pagehide', () => animation?.finish());
+    openLinkedReference();
+  </script>
+</BaseLayout>

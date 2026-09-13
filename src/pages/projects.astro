@@ -1,0 +1,102 @@
+---
+import ProjectDossier from '../components/ProjectDossier.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionNav from '../components/SectionNav.astro';
+import '../styles/projects.css';
+import { projectData, featuredProjects, type Category } from '../data/projects.ts';
+
+// Build-time data guards — fail the build if the inventory is malformed.
+const slugs = projectData.map((p) => p.slug);
+if (new Set(slugs).size !== slugs.length) {
+  throw new Error('projects.ts: duplicate slug detected');
+}
+
+type SectionDef = { id: Exclude<Category, never>; label: string; sub: string };
+const SECTIONS: SectionDef[] = [
+  { id: 'internship', label: 'Internship', sub: 'Sembcorp · 2024–2025' },
+  ...(projectData.some(p => p.category === 'hackathon') ? [{ id: 'hackathon' as const, label: 'Hackathons', sub: '' }] : []),
+  { id: 'personal', label: 'Personal', sub: '' },
+  { id: 'others', label: 'Others', sub: '' },
+  { id: 'year2', label: 'School · Year 2', sub: '' },
+  { id: 'year1', label: 'School · Year 1', sub: '' },
+];
+
+// Jump links follow the displayed project sections.
+const NAV = SECTIONS.map((s) => ({ id: s.id, label: s.label }));
+
+const bySection = (id: Category) => projectData.filter((p) => p.category === id);
+const pad = (n: number) => String(n).padStart(2, '0');
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<BaseLayout title="Projects — Aarron Loke">
+  <header class="proj-hero">
+    <div class="proj-hero__inner">
+      <span class="proj-hero__kicker">PROJECTS · {pad(projectData.length)} BUILT</span>
+      <h1 class="proj-hero__title">Things I've built.</h1>
+      <p class="proj-hero__intro">
+        Internship work, personal builds, hackathons, and coursework — the full body, presented plainly.
+      </p>
+      <nav class="project-bookmarks" aria-label="Highlighted projects"><span>Highlights</span>{featuredProjects.map(p => <a href={`#${p.slug}`}>{p.name} <span aria-hidden="true">&#8600;</span></a>)}</nav>
+    </div>
+  </header>
+
+  <div class="proj-shell">
+    <SectionNav items={NAV} label="Jump to section" />
+
+    <div class="proj-layout">
+
+      <main class="proj-main">
+        <!-- Category sections -->
+        {SECTIONS.map((sec, si) => {
+          const rows = bySection(sec.id);
+          return (
+            <section class="proj-section" id={sec.id}>
+              <div class="section-head">
+                <span class="section-head__index">{pad(si + 1)}</span>
+                <h2 class="section-head__kicker">{sec.label}</h2>
+                {sec.sub && <span class="section-head__sub">{sec.sub}</span>}
+                <span class="section-head__count">[{pad(rows.length)}]</span>
+              </div>
+              <ol class="proj-list">
+                {rows.map((p, ri) => (
+                  <li class:list={["proj-row", { "proj-row--featured": p.featured }]} id={p.slug}>
+
+                    <span class="row-num">{pad(ri + 1)}</span>
+                    <h3 class="row-name">
+                      {p.name}
+                      {p.featured && <span class="row-highlight">HIGHLIGHT</span>}
+                      {p.experimental && <span class="row-exp">[EXP]</span>}
+                    </h3>
+                    <div class="row-meta">
+                      {p.event && (p.eventUrl ? (
+                        <a class="row-repo" href={p.eventUrl} target="_blank" rel="noopener noreferrer" aria-label={p.event + ' hackathon website'}>
+                          {p.event} <em aria-hidden="true">&#8599;</em>
+                        </a>
+                      ) : <span class="row-year">{p.event}</span>)}
+                      {p.year && <span class="row-year">{p.year}</span>}
+                      {p.repo && (
+                        <a class="row-repo" href={p.repo} target="_blank" rel="noopener noreferrer">
+                          repo <em aria-hidden="true">↗</em>
+                        </a>
+                      )}
+                    </div>
+                    <p class="row-blurb">{p.blurb}</p>
+                    <ul class="row-stack">
+                      {p.stack.slice(0, 5).map((s) => <li>{s}</li>)}
+                      {p.stack.length > 5 && (
+                        <li class="row-stack__more">+{p.stack.length - 5}</li>
+                      )}
+                    </ul>
+                    {p.materialsNote && <p class="row-materials">{p.materialsNote}</p>}
+                    {p.experienceLink && <a class="row-experience" href={`${base}/${p.experienceLink.path}`}>{p.experienceLink.label} <span aria-hidden="true">&#8594;</span></a>}
+                    {p.detail && <><button class="row-dossier" type="button" data-open-dossier={`dossier-${p.slug}`} aria-haspopup="dialog">Open dossier <span aria-hidden="true">&#8599;</span></button><ProjectDossier project={p} detail={p.detail} dialogOnly /></>}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          );
+        })}
+      </main>
+    </div>
+  </div>
+</BaseLayout>

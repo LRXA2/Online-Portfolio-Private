@@ -1,0 +1,169 @@
+---
+import { testimonials } from '../data/testimonials';
+const base = import.meta.env.BASE_URL;
+---
+{testimonials.length > 0 && <testimonial-carousel aria-label="Testimonials" role="region" aria-roledescription="carousel">
+  <div class="quote-stage" id="testimonial-track" tabindex="0" aria-label="Testimonial quotes; use left and right arrow keys to browse">
+    {testimonials.map((t, index) => (
+      <article class="quote-slide" role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${testimonials.length}`}>
+        <div class="quote-content">
+          <blockquote>{t.placeholder ? 'A real reference will appear here once collected.' : t.excerpt}</blockquote>
+          <div class="quote-attribution">
+            <span class="quote-author">{t.author}</span>
+            <span>{t.title}</span>
+            {t.when && <span class="quote-date">{t.when}</span>}
+          </div>
+          {!t.placeholder && <a href={`${base}/experience#ref-${index}`}>Read full reference <span aria-hidden="true">&#8594;</span></a>}
+        </div>
+        <button class="quote-preview" type="button" hidden aria-label={`Show testimonial: ${t.placement}, ${t.designation}`} tabindex="-1"></button>
+      </article>
+    ))}
+    <button class="quote-nav quote-nav--previous" type="button" aria-label="Previous testimonial" aria-controls="testimonial-track"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M20 12H4m7-7-7 7 7 7" /></svg></button>
+    <button class="quote-nav quote-nav--next" type="button" aria-label="Next testimonial" aria-controls="testimonial-track"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M4 12h16m-7-7 7 7-7 7" /></svg></button>
+  </div>
+  <div class="quote-controls" hidden>
+    <div class="quote-selectors" role="group" aria-label="Select a testimonial">
+      {testimonials.map((t) => <button type="button" aria-label={`Show testimonial: ${t.placement}, ${t.designation}`} aria-controls="testimonial-track"><span class="quote-selector-placement">{t.placement}</span><span class="quote-selector-designation">{t.designation}</span></button>)}
+    </div>
+    <span class="quote-status" role="status" aria-live="polite" aria-atomic="true"></span>
+  </div>
+</testimonial-carousel>}
+
+<style>
+  testimonial-carousel { display: block; min-width: 0; max-width: 64rem; margin-inline: auto; }
+  .quote-stage { display: grid; gap: 1rem; padding: 1rem 0; }
+  .quote-slide { min-width: 0; border: 1px solid var(--line); background: var(--color-bg-secondary); }
+  .quote-content { display: flex; flex-direction: column; height: 100%; padding: clamp(1.25rem, 3vw, 2rem); }
+  blockquote { margin: 0 0 1.5rem; font: 400 var(--text-lead)/1.5 var(--font-display); }
+  blockquote::before { content: '\201C'; color: var(--color-accent); }
+  blockquote::after { content: '\201D'; color: var(--color-accent); }
+  .quote-attribution { display: flex; flex-direction: column; gap: .35rem; margin-top: auto; font: var(--text-meta)/1.6 var(--font-mono); color: var(--color-text-secondary); }
+  .quote-author { font: 600 var(--text-ui)/1.5 var(--font-body); color: var(--color-text-primary); }
+  .quote-date { color: var(--color-accent); }
+  .quote-content a { align-self: start; margin-top: 1rem; padding: .5rem 0; font: var(--text-ui)/1.6 var(--font-body); color: var(--color-accent); text-underline-offset: .3rem; }
+  .quote-content a:hover { text-decoration: underline; }
+  [data-ready] .quote-stage { position: relative; isolation: isolate; overflow: hidden; grid-template-columns: minmax(0, 1fr); padding: 1.5rem 12%; touch-action: pan-y pinch-zoom; user-select: none; }
+  [data-ready] .quote-slide { grid-area: 1 / 1; position: relative; transform: translateX(calc(var(--offset) + var(--drag, 0px))) scale(.88); opacity: .45; z-index: 1; transition: transform 600ms cubic-bezier(.22, 1, .36, 1), opacity 600ms ease; will-change: transform; }
+  [data-ready] .quote-slide[data-position="active"] { transform: translateX(var(--drag, 0px)) scale(1); opacity: 1; z-index: 3; }
+  [data-ready] .quote-slide[data-position="hidden"] { opacity: 0; pointer-events: none; z-index: 0; }
+  [data-dragging] .quote-slide { transition: none; user-select: none; }
+  [data-dragging] .quote-stage { cursor: grabbing; }
+  .quote-selector-placement { display: block; font-weight: 600; }
+  .quote-selector-designation { display: block; margin-top: .35rem; font-size: var(--text-meta); line-height: 1.5; }
+  .quote-preview { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; cursor: pointer; }
+  .quote-nav { display: none; }
+  [data-ready] .quote-nav { position: absolute; top: 50%; z-index: 4; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--color-accent); background: var(--color-bg-primary); color: var(--color-accent); font: var(--text-lead)/1 var(--font-body); transform: translateY(-50%); cursor: pointer; }
+  .quote-nav--previous { left: .25rem; }
+  .quote-nav svg { display: block; width: 24px; height: 24px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .quote-nav--next { right: .25rem; }
+  [data-ready] .quote-nav[hidden] { display: none; }
+  .quote-controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .75rem 1.25rem; margin-top: .5rem; }
+  .quote-controls[hidden], .quote-preview[hidden] { display: none; }
+  .quote-selectors { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: .5rem 1rem; }
+  .quote-selectors button { min-width: 44px; min-height: 44px; padding: .5rem; background: transparent; border-bottom: 2px solid var(--line); color: var(--color-text-secondary); font: var(--text-ui)/1.5 var(--font-body); cursor: pointer; }
+  .quote-selectors button:hover { color: var(--color-accent); border-color: var(--color-accent); }
+  .quote-selectors button[aria-current="true"] { background: transparent; border-color: var(--color-accent); color: var(--color-accent); }
+  .quote-status { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  :is(button, a):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  .quote-stage:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  @media (max-width: 600px) {
+    [data-ready] .quote-stage { padding-inline: 7%; }
+    .quote-content { padding: 1.25rem; }
+    .quote-selectors { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+    blockquote { font-size: var(--text-body); }
+  }
+  @media (prefers-reduced-motion: reduce) { [data-ready] .quote-slide { transition: none; } }
+</style>
+
+<script>
+  class TestimonialCarousel extends HTMLElement {
+    connectedCallback() {
+      const stage = this.querySelector<HTMLElement>('.quote-stage')!;
+      const slides = Array.from(this.querySelectorAll<HTMLElement>('.quote-slide'));
+      const selectors = Array.from(this.querySelectorAll<HTMLButtonElement>('.quote-selectors button'));
+      const controls = this.querySelector<HTMLElement>('.quote-controls')!;
+      const status = this.querySelector<HTMLElement>('.quote-status')!;
+      this.listeners?.abort();
+      this.listeners = new AbortController();
+      const { signal } = this.listeners;
+      let active = 0;
+      let gesture: { x: number; y: number; id: number; dragging: boolean } | undefined;
+      let swiped = false;
+
+      const select = (index: number) => {
+        active = (index + slides.length) % slides.length;
+        slides.forEach((slide, i) => {
+          let distance = (i - active + slides.length) % slides.length;
+          if (distance > slides.length / 2) distance -= slides.length;
+          const position = distance === 0 ? 'active' : Math.abs(distance) === 1 ? 'preview' : 'hidden';
+          slide.dataset.position = position;
+          slide.style.setProperty('--offset', `${distance * 30}%`);
+          const content = slide.querySelector<HTMLElement>('.quote-content')!;
+          if (i !== active && content.contains(document.activeElement)) stage.focus({ preventScroll: true });
+          content.inert = i !== active;
+          slide.setAttribute('aria-hidden', String(position === 'hidden'));
+          slide.querySelector<HTMLButtonElement>('.quote-preview')!.hidden = position !== 'preview';
+          selectors[i].setAttribute('aria-current', String(i === active));
+        });
+        status.textContent = `${active + 1} / ${slides.length}`;
+      };
+      this.querySelector<HTMLButtonElement>('.quote-nav--previous')!.addEventListener('click', () => select(active - 1), { signal });
+      this.querySelector<HTMLButtonElement>('.quote-nav--next')!.addEventListener('click', () => select(active + 1), { signal });
+      this.querySelectorAll<HTMLButtonElement>('.quote-nav').forEach(button => { button.hidden = slides.length < 2; });
+      selectors.forEach((button, index) => button.addEventListener('click', () => select(index), { signal }));
+      slides.forEach((slide, index) => slide.querySelector('button')!.addEventListener('click', () => select(index), { signal }));
+      this.addEventListener('keydown', (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        const targets: Record<string, number> = { ArrowLeft: active - 1, ArrowRight: active + 1, Home: 0, End: slides.length - 1 };
+        if (!(event.key in targets)) return;
+        event.preventDefault();
+        select(targets[event.key]);
+        if (selectors.includes(document.activeElement as HTMLButtonElement)) selectors[active].focus();
+      }, { signal });
+      const resetDrag = () => {
+        gesture = undefined;
+        this.removeAttribute('data-dragging');
+        stage.style.removeProperty('--drag');
+      };
+      stage.addEventListener('dragstart', (event) => event.preventDefault(), { signal });
+      stage.addEventListener('pointerdown', (event) => {
+        if (!event.isPrimary || event.button !== 0 || slides.length < 2) return;
+        if ((event.target as Element).closest('.quote-nav, a')) return;
+        gesture = { x: event.clientX, y: event.clientY, id: event.pointerId, dragging: false };
+        swiped = false;
+      }, { signal });
+      stage.addEventListener('pointermove', (event) => {
+        if (!gesture || gesture.id !== event.pointerId) return;
+        const dx = event.clientX - gesture.x;
+        const dy = event.clientY - gesture.y;
+        if (!gesture.dragging) {
+          if (Math.abs(dy) > 12 && Math.abs(dy) >= Math.abs(dx)) { resetDrag(); return; }
+          if (Math.abs(dx) <= 12) return;
+          gesture.dragging = true;
+          this.setAttribute('data-dragging', '');
+          stage.setPointerCapture(event.pointerId);
+        }
+        stage.style.setProperty('--drag', `${dx}px`);
+      }, { signal });
+      stage.addEventListener('pointerup', (event) => {
+        if (!gesture || gesture.id !== event.pointerId) return;
+        const dx = event.clientX - gesture.x;
+        const advance = gesture.dragging && Math.abs(dx) > 40;
+        swiped = gesture.dragging;
+        resetDrag();
+        if (advance) select(active + (dx < 0 ? 1 : -1));
+      }, { signal });
+      stage.addEventListener('pointercancel', resetDrag, { signal });
+      stage.addEventListener('lostpointercapture', () => { if (gesture) resetDrag(); }, { signal });
+      stage.addEventListener('click', (event) => {
+        if (swiped) { event.preventDefault(); event.stopPropagation(); swiped = false; }
+      }, { capture: true, signal });
+      select(0);
+      this.setAttribute('data-ready', '');
+      controls.hidden = slides.length < 2;
+    }
+    private listeners?: AbortController;
+    disconnectedCallback() { this.listeners?.abort(); }
+  }
+  if (!customElements.get('testimonial-carousel')) customElements.define('testimonial-carousel', TestimonialCarousel);
+</script>

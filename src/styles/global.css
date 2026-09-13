@@ -1,0 +1,114 @@
+/* ==================== */
+/* CSS CUSTOM PROPERTIES (THEME SYSTEM) */
+/* ==================== */
+
+:root {
+  /* Shared typography levels; see DESIGN.md. */
+  --text-meta: .875rem;
+  --text-ui: 1rem;
+  --text-body: clamp(1.25rem, 1.125rem + 0.25vw, 1.375rem);
+  --text-lead: 1.5rem;
+  --text-title: 2rem;
+  --text-section: clamp(2rem, 4vw, 3rem);
+  --text-page: clamp(3rem, 7vw, 5rem);
+  --text-hero: clamp(5rem, 10vw, 9rem);
+  --leading-body: 1.7;
+
+  /* Muted copper accent on charcoal. */
+  --color-brand-primary: #D7A184;
+  --color-brand-primary-hover: #E7B99A;
+  --color-brand-secondary: #EDE5D8;
+  --color-accent: #D7A184;
+  --color-accent-dark: #E7B99A;
+  --color-accent-tint: #342B25;
+
+  --color-accent-on-dark: #D7A184;
+
+  /* Channel triplets for the two tokens that need alpha variants. Plain CSS
+     cannot derive rgb(... / alpha) from a hex custom property. */
+  --color-bg-dark-rgb: 17 19 17;
+  --color-text-light-rgb: 237 229 216;
+
+  /* Shared page backgrounds. */
+  --color-theme-index: #181918;
+  --color-theme-projects: #181918;
+  --color-theme-experience: #181918;
+
+  /* Neutral Colors */
+  --color-bg-primary: #181918;
+  --color-bg-secondary: #252724;
+  --color-bg-white: #212320;
+  --color-bg-dark: #111311;
+
+  /* Text Colors */
+  --color-text-primary: #EDE5D8;
+  --color-text-secondary: #B7B4A9;
+  --color-text-light: #EDE5D8;
+
+  /* Typography families */
+  --font-body: 'Montserrat', sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
+
+  /* Unified Navbar Height */
+  --navbar-height: 80px;
+}
+
+/* ==================== */
+/* 1. RESET & BASE STYLES */
+/* ==================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: inherit;
+}
+
+html {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  padding-top: var(--navbar-height);
+}
+
+/* ==================== */
+/* 2. TYPOGRAPHY */
+/* ==================== */
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0.5em;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+a {
+  color: var(--color-brand-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ==================== */
+/* 3. CONTAINERS */
+/* ==================== */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}

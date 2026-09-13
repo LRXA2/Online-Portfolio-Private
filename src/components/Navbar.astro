@@ -1,0 +1,36 @@
+---
+const base = import.meta.env.BASE_URL; // '/Online-Portfolio-Private' (no trailing slash)
+const path = Astro.url.pathname;
+
+const links = [
+  { label: 'PROJECTS', href: `${base}/projects`, match: ['projects'] },
+  { label: 'EXPERIENCES', href: `${base}/experience`, match: ['experience'] },
+];
+
+// Determine the current page slug for the navbar's page-specific class.
+const slug = path.replace(base, '').replace(/^\/+/, '').replace(/\/+$/, '');
+const pageClassMap: Record<string, string> = {
+  '': 'index-page',
+  'projects': 'projects-page',
+  'experience': 'experience-page',
+};
+const pageClass = pageClassMap[slug] ?? 'default-page';
+
+function isActive(match: string[]) {
+  return match.includes(slug);
+}
+---
+<nav id="mainNav" class:list={['navbar', pageClass]}>
+  <div class="navbar-container">
+    <a href={`${base}/`} class="navbar-brand" aria-label="Aarron Loke ? home">Aarron Loke</a>
+    <div class="navbar-menu">
+      <ul class="navbar-links">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} aria-current={isActive(l.match) ? "page" : undefined} class:list={['navbar-link', { active: isActive(l.match) }]}>{l.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</nav>
