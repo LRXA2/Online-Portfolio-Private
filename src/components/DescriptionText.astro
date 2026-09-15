@@ -1,0 +1,27 @@
+---
+interface Props {
+  text: string;
+  link?: { inlineText?: string; url: string };
+}
+const { text, link } = Astro.props;
+const phrase = link?.inlineText;
+const index = phrase ? text.indexOf(phrase) : -1;
+---
+{index >= 0 && phrase && link ? <>{text.slice(0, index)}<a class="description-link" href={link.url} target="_blank" rel="noopener noreferrer">{phrase}<span aria-hidden="true">&#8239;&#8599;</span></a>{text.slice(index + phrase.length)}</> : text}
+
+<style>
+  .description-link {
+    color: var(--color-accent);
+    background: var(--color-accent-tint);
+    font-weight: 600;
+    padding: .05em .15em;
+    border-radius: .15em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    text-decoration: none;
+    text-underline-offset: .2em;
+  }
+  .description-link:hover { color: var(--color-brand-primary-hover); text-decoration: underline; }
+  .description-link span { font-size: .8em; white-space: nowrap; }
+  .description-link:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+</style>

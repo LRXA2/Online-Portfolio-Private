@@ -51,7 +51,7 @@
   --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
 
   /* Unified Navbar Height */
-  --navbar-height: 80px;
+  --navbar-height: 5rem;
 }
 
 /* ==================== */
@@ -68,15 +68,16 @@
 
 html {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 100%;
   line-height: 1.6;
   scroll-behavior: smooth;
 }
 
 body {
+  overflow-wrap: anywhere;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  min-height: 100vh;
+  min-height: 100dvh;
   padding-top: var(--navbar-height);
 }
 
@@ -108,7 +109,7 @@ a:hover {
 /* ==================== */
 
 .container {
-  max-width: 1200px;
+  max-width: 75rem;
   margin: 0 auto;
   padding: 0 1.5rem;
 }

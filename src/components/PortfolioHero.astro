@@ -15,18 +15,18 @@ import ForecastExplorer from './ForecastExplorer.astro';
 <ForecastExplorer />
 <style>
   .portfolio-hero { position: relative; isolation: isolate; overflow: hidden; padding: 0 clamp(1.5rem, 6vw, 6rem); background: #181918; }
-  .portfolio-hero__inner { max-width: 1200px; margin: 0 auto; padding: clamp(1.5rem, 2.5vw, 2.5rem) 0 2rem; display: grid; grid-template-columns: minmax(0,.85fr) minmax(0,1.15fr); gap: 3rem; align-items: center; }
-  .portfolio-hero__content { position: relative; max-width: 640px; }
+  .portfolio-hero__inner { max-width: 75rem; margin: 0 auto; padding: clamp(1.5rem, 2.5vw, 2.5rem) 0 2rem; display: grid; grid-template-columns: minmax(0,.85fr) minmax(0,1.15fr); gap: 3rem; align-items: center; }
+  .portfolio-hero__content { position: relative; max-width: 40rem; }
   .portfolio-hero__eyebrow span { color: var(--color-accent); margin: 0 .65rem; }
   h1 { font: 400 clamp(5.5rem, 9.5vw, 9rem)/.88 var(--font-display); letter-spacing: -.055em; margin: 0 0 1.8rem; }
   h1 em { color: var(--color-accent); font-weight: 400; }
   .portfolio-hero__statement { font: 400 clamp(1.5rem, 2.2vw, 2rem)/1.35 var(--font-display); margin: 0; }
   .portfolio-hero__statement em { color: var(--color-accent); }
-  @media(min-width: 768px) and (max-width: 1050px) { .portfolio-hero__inner { gap: 1.5rem; } h1 { font-size: var(--text-page); } }
-  @media(max-width: 767px) {
-    .portfolio-hero__inner { min-height: auto; padding: 1.5rem 0 2.5rem; grid-template-columns: 1fr; gap: 3.5rem; }
+  @media(min-width: 48em) and (max-width: 65.625em) { .portfolio-hero__inner { gap: 1.5rem; } h1 { font-size: var(--text-page); } }
+  @media(max-width: 47.9375em) {
+    .portfolio-hero__inner { min-height: auto; padding: 1.5rem 0 2rem; grid-template-columns: 1fr; gap: 2rem; }
     .portfolio-hero__content { width: 100%; }
-    h1 { font-size: clamp(5rem, 19vw, 7rem); }
+    h1 { font-size: clamp(3.5rem, 15vw, 5rem); }
     .portfolio-hero__statement { font-size: var(--text-lead); }
   }
 </style>

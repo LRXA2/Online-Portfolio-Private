@@ -9,6 +9,7 @@ interface ProjectBase {
   stack: string[];
   repo?: string;         // absolute GitHub URL; omit when none
   experimental?: boolean;
+  status?: 'Ongoing';
   materialsNote?: string;
   experienceLink?: { path: string; label: string };
 
@@ -30,9 +31,10 @@ export interface ProjectDetail {
     stages: { title: string; body: string }[];
     example: { query: string; filters: string[]; result: string; explanation: string };
   };
-  recognition?: { label: string; year: string; title: string; body: string; url: string; linkLabel: string };
-  galleries?: { title: string; description: string; images: { src: string; alt: string; caption: string; width: number; height: number }[] }[];
+  recognition?: { inlineText?: string; label: string; year: string; title: string; body: string; url: string; linkLabel: string };
+  galleries?: { title: string; description: string; layout?: 'wide'; images: { src: string; alt: string; caption: string; width: number; height: number }[] }[];
   mediaCredit?: string;
+  additionalFeatures?: { title: string; items: { label: string; body: string }[] };
   notes: { label: string; title: string; body: string }[];
 }
 
@@ -50,7 +52,6 @@ export const projectData: Project[] = [
     year: '2025',
     category: 'internship',
     featured: true,
-    materialsNote: 'Code and data are proprietary to Sembcorp.',
     experienceLink: { path: 'experience#sembcorp', label: 'View experience' },
     blurb: 'Solar-irradiance forecasting, taken end-to-end — EDA, ETL, feature selection, modelling — over spatial and temporal irradiance drivers. A strong proof-of-concept got it adopted as an official company initiative; forecasts now serve Business Development (customer solar-site queries, liquidated-damages risk) and O&M (cleaning/maintenance scheduling).',
     stack: ['Python', 'Azure Synapse', 'Azure Data Explorer', 'KQL', 'Grafana'],
@@ -134,26 +135,97 @@ export const projectData: Project[] = [
     stack: ['Python', 'FastAPI', 'BM25', 'Vector + RRF', 'Cross-encoder'],
   },
   {
+    // Preserve existing links to this project as its name evolves.
     slug: 'reminder-agent',
     featured: true,
+    name: 'Secretary Agent',
+    status: 'Ongoing',
+    year: '2025–present',
+    category: 'personal',
+    repo: 'https://github.com/LRXA2/Secretary-Agent',
+    blurb: 'A personal assistant I use every day, evolved from Reminder Agent. Telegram and a web workspace bring reminders, notes, calendar events, news, and Singapore weather together, backed by Python, local model routing, and configurable integrations.',
+    stack: ['Python', 'React + TypeScript', 'FastAPI', 'SQLite', 'Telegram API', 'Google Calendar', 'Local LLMs'],
     detail: {
       label: 'Project dossier',
-      eyebrow: 'PERSONAL BUILD',
-      workflowLabel: '01 / VISUAL PLACEHOLDER',
-      workflowTitle: 'An example, from input to reminder.',
-      steps: ['Image, PDF or audio', 'Draft for review', 'Confirmed reminder'],
-      caption: 'Illustrative workflow based on the project summary. A real screenshot or demo will replace this placeholder.',
+      eyebrow: 'PERSONAL BUILD / IN DAILY USE',
+      workflowLabel: 'CAPTURE TO ACTION',
+      workflowTitle: 'A suggestion becomes an action when I confirm it.',
+      steps: ['Capture source', 'Extract a draft', 'Review and edit', 'Choose what to save'],
+      caption: 'Telegram capture can propose tasks, events, or notes. The web Capture workspace offers summaries, text extraction, and task drafts; creating each suggested task or saving a result to the notes inbox is an explicit action.',
+      galleries: [
+        {
+          title: 'A workspace that earns its place.',
+          description: 'Reminder Agent started with remembering things. Secretary Agent brings the surrounding work into the same system: collecting information, keeping plans in view, and finding notes again. Telegram handles quick interactions; the browser provides room to read, review, and organise.',
+          layout: 'wide',
+          images: [{
+            src: 'assets/images/secretary-agent/console.png',
+            alt: 'Secretary Agent console with an interactive globe, task counts, Singapore weather, and a topic-based news digest. All displayed data is fictional.',
+            caption: 'The real console interface, populated with fictional tasks, news, and weather for this demonstration.',
+            width: 1440, height: 1000,
+          }],
+        },
+        {
+          title: 'Keep the next step in view.',
+          description: 'Reminders and calendar events meet in the Today workspace. Overdue work stays visible, tasks retain their priorities, and the agenda sits alongside them. Google Calendar can synchronise in both directions when configured, so plans remain connected to the calendar I already use.',
+          layout: 'wide',
+          images: [{
+            src: 'assets/images/secretary-agent/today.png',
+            alt: 'Today screen with one overdue task, three tasks due today, and two calendar events, using fictional example data.',
+            caption: 'A fictional demonstration day: tasks grouped by due date on the left, calendar events on the right.',
+            width: 1440, height: 1000,
+          }],
+        },
+        {
+          title: 'Catch the thought. Keep the context.',
+          description: 'Quick notes land in an inbox before being reviewed and filed by topic. Obsidian provides the note store; the dashboard brings inbox review, editing, and browsing together. Read-later articles and an optional companion search service extend the same collection.',
+          layout: 'wide',
+          images: [{
+            src: 'assets/images/secretary-agent/notes.png',
+            alt: 'Notes workspace showing two fictional inbox captures, topic folders, and a sample note about local AI experiments.',
+            caption: 'The real notes workspace with fictional inbox items and a sample filed note.',
+            width: 1440, height: 1148,
+          }],
+        },
+        {
+          title: 'Let the model draft. Keep the decision.',
+          description: 'Capture turns incoming material into something reviewable. In this example, a short message asks for project preparation and a parcel reminder. The web interface exposes the proposed titles, dates, and priorities before either task is created.',
+          layout: 'wide',
+          images: [{
+            src: 'assets/images/secretary-agent/capture.png',
+            alt: 'Capture review panel with two editable task suggestions and separate Create this task buttons. The model response is fictional demonstration data.',
+            caption: 'The real review interface with illustrative task suggestions. Each task can be edited before it is created.',
+            width: 1115, height: 602,
+          }],
+        },
+        {
+          title: 'Two interfaces. One application.',
+          description: 'Telegram and the React dashboard use shared application capabilities. A Python process brings together the bot, FastAPI routes, scheduling, persistence, and service adapters. Features register their capabilities so the interfaces can reuse the same operations.',
+          layout: 'wide',
+          images: [{
+            src: 'assets/images/secretary-agent/architecture.svg',
+            alt: 'Architecture diagram: Telegram and React connect to shared Python application capabilities, with APScheduler, SQLite, Obsidian, configurable model providers, Google services, and news and weather feeds.',
+            caption: 'Simplified architecture based on the repository. Integrations are enabled by configuration; companion file search runs as a separate service.',
+            width: 1400, height: 1000,
+          }],
+        },
+      ],
+      mediaCredit: 'Screenshots show the private application frontend with fictional demonstration data. No personal messages, notes, account details, or calendar records are shown. The linked repository is the public version of the project.',
+      additionalFeatures: {
+        title: 'Also built in',
+        items: [
+          { label: 'Mail and briefings', body: 'Gmail triage, multi-account support, and scheduled briefings.' },
+          { label: 'Reading and research', body: 'Topic-based news, read-later articles, and optional companion file search.' },
+          { label: 'Capture and transcription', body: 'Image understanding, audio transcription, and chat summaries.' },
+          { label: 'Configuration', body: 'Per-feature model selection, service health, and scheduled-job visibility.' },
+        ],
+      },
       notes: [
-        { label: '02 / EXAMPLE PLACEHOLDER', title: 'See it in use.', body: 'A worked example will go here, showing the source material, the proposed reminder, and the confirmation step.' },
-        { label: '03 / DETAILS PLACEHOLDER', title: 'Behind the build.', body: 'Space for the implementation approach, design decisions, graphics, and verified results.' },
+        { label: 'INFORMATION, TOGETHER', title: 'News and weather belong here too.', body: 'Topic-based news digests and Singapore weather make the assistant useful beyond task management. The console offers a quick overview, while the news reader provides space for longer reports. Scheduled delivery and briefings are configurable.' },
+        { label: 'MODEL ROUTING', title: 'Choose a model for the job.', body: 'Ollama, llama.cpp, and OpenAI-compatible local servers provide configurable model backends. A default model can be overridden for individual features, with speech models configured separately. Image understanding depends on a suitable vision model.' },
+        { label: 'PERSISTENCE & SCHEDULING', title: 'Keep state beyond the conversation.', body: 'SQLite stores application state and APScheduler runs configured reminders, digests, and integration jobs. Notes live in an Obsidian vault. Telegram and the dashboard are interfaces into these capabilities, rather than separate copies of the same tasks.' },
+        { label: 'BOUNDARIES', title: 'Local operation, connected services.', body: 'The application runs on my own machine, with optional Google Calendar, Gmail, news, and weather connections. Local model processing is available; connected features still depend on their providers. The dashboard is designed for localhost or a trusted LAN.' },
       ],
     },
-    name: 'Reminder Agent',
-    year: '2025',
-    category: 'personal',
-    repo: 'https://github.com/LRXA2/reminder-agent-public',
-    blurb: 'Multimodal Telegram planning bot: images, PDFs, and audio become reminder drafts you confirm before they save. SQLite-backed, with two-way Google Calendar sync and Gmail triage.',
-    stack: ['Python', 'SQLite', 'Telegram API', 'Google Calendar', 'Gmail'],
   },
   {
     slug: 'stock-forecast',
@@ -210,6 +282,7 @@ export const projectData: Project[] = [
     detail: {
       label: 'Hackathon dossier',
       recognition: {
+        inlineText: 'featured teams',
         label: 'Featured team / Garena AI Build Challenge',
         year: '2026',
         title: 'Featured team at Garena AI Build Challenge 2026',
@@ -292,7 +365,7 @@ export const projectData: Project[] = [
     event: 'Garena',
     eventUrl: 'https://aibuildchallenge.garena.sg/index.html#overview',
     repo: 'https://github.com/LRXA2/Garena-AI-Build-2026Garena-AI-Build-2026-Public',
-    blurb: 'Team captain of Team Cooked, building a collaborative emote-generation prototype for esports intermissions. AI groups audience ideas by meaning and generates visual options; viewers vote on components that are combined into a final emote for host review. Participant, host, and broadcast views connect the experience, with local inference through Ollama and ComfyUI.',
+    blurb: 'Team Cooked is one of the featured teams at Garena AI Build Challenge 2026. As team captain, I helped build a collaborative emote-generation prototype for esports intermissions. AI groups audience ideas by meaning and generates visual options; viewers vote on components that are combined into a final emote for host review. Participant, host, and broadcast views connect the experience, with local inference through Ollama and ComfyUI.',
     stack: ['Python', 'FastAPI', 'Sentence Transformers', 'Ollama', 'ComfyUI', 'React'],
   },
 

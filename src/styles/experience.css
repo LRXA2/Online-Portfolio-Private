@@ -31,7 +31,7 @@
 
 .exp-hero__inner {
   position: relative;
-  max-width: 1100px;
+  max-width: 68.75rem;
   margin: 0 auto;
 }
 
@@ -81,7 +81,7 @@
 }
 
 .role {
-  max-width: 1100px;
+  max-width: 68.75rem;
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 0.5fr) minmax(0, 1.5fr);
@@ -310,7 +310,7 @@
    RESPONSIVE
    ======================================== */
 
-@media (max-width: 720px) {
+@media (max-width: 45em) {
   .role {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -343,6 +343,8 @@
 }
 
 /* Full-reference disclosures retain native details semantics without JS. */
-.role__ref-close { margin-top: 1.5rem; padding: .65rem 0; background: transparent; color: var(--color-accent); font: var(--text-ui)/1.5 var(--font-body); cursor: pointer; text-decoration: underline; text-underline-offset: .3rem; }
+.role__ref-close { margin-top: 1.5rem; padding: .65rem 0; background: transparent; color: var(--color-accent); font: var(--text-ui)/1.5 var(--font-body); cursor: pointer; text-decoration: none; text-underline-offset: .3rem; }
 .role__ref-close[hidden] { display: none; }
 .role__ref-close:focus-visible, .role__ref-summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+
+.role__ref-close:hover { text-decoration: underline; }

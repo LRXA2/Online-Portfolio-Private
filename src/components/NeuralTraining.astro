@@ -34,7 +34,7 @@ const edges = [[0,2,0],[1,2,1],[0,3,2],[1,3,3],[2,4,6],[3,4,7]];
 </div>
 <style>
   .neural-training { --signal: var(--color-accent); }
-  .network-canvas { max-width: 760px; margin: auto; background: radial-gradient(ellipse at 50% 50%, #d7a18410, transparent 70%); }
+  .network-canvas { max-width: 47.5rem; margin: auto; background: radial-gradient(ellipse at 50% 50%, #d7a18410, transparent 70%); }
   svg { display: block; width: 100%; height: auto; overflow: visible; }
   .network-mobile { display: none; }
   .edge { stroke: #666e60; stroke-width: 2; }
@@ -50,10 +50,10 @@ const edges = [[0,2,0],[1,2,1],[0,3,2],[1,3,3],[2,4,6],[3,4,7]];
   .network-result { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; align-items: center; padding: 1.2rem 0; border-top: 1px solid var(--line); font: var(--text-ui)/1.6 var(--font-mono); color: var(--color-text-secondary); }
   .prediction-meter > div:first-child { display: flex; justify-content: space-between; gap: 1rem; }
   b, strong { font-weight: 400; color: var(--color-accent); }
-  .meter-track { position: relative; height: 7px; background: #34392f; margin-top: .8rem; }
+  .meter-track { position: relative; height: 0.4375rem; background: #34392f; margin-top: .8rem; }
   .meter-track span { display: block; height: 100%; background: var(--color-accent); }
-  .meter-track i { position: absolute; height: 15px; top: -4px; left: 80%; border-left: 2px solid var(--color-text-primary); }
+  .meter-track i { position: absolute; height: 0.9375rem; top: -.25rem; left: 80%; border-left: 2px solid var(--color-text-primary); }
   .loss-value strong, .update-value strong { display: block; font-size: var(--text-lead); }
-  @media(max-width: 600px) { .network-result { grid-template-columns: 1fr 1fr; gap: 1rem; } .prediction-meter { grid-column: 1/-1; } }
-  @media(max-width: 500px) { .network-desktop { display: none; } .network-mobile { display: block; max-height: 410px; } .node-value { font-size: 25px; } .node-label { font-size: 23px; } .edge-value { display: none; } }
+  @media(max-width: 37.5em) { .network-result { grid-template-columns: 1fr 1fr; gap: 1rem; } .prediction-meter { grid-column: 1/-1; } }
+  @media(max-width: 31.25em) { .network-desktop { display: none; } .network-mobile { display: block; max-height: 25.625rem; } .node-value { font-size: 25px; } .node-label { font-size: 23px; } .edge-value { display: none; } }
 </style>

@@ -20,17 +20,32 @@ const layers = forecastLayers(1);
           <span class="layer-caption" style={`--label-top:${(layer.label.y+24)/475*100}%`}>{demonstrationLayers[index].label}<span aria-hidden="true">&#8595;</span></span>
         </button>)}
       </div>
-      <p class="layer-instruction">Select a layer to see it in motion.</p>
+      <p class="layer-instruction"><span class="desktop-layer-instruction">Select a layer to see it in motion.</span><span class="mobile-layer-instruction">Select a layer to learn how it works.</span></p>
     </div>
     <section id="layer-demonstration" class="layer-demonstration" aria-labelledby="demonstration-title" hidden>
       <div class="demonstration-header"><div><h3 id="demonstration-title" tabindex="-1">Observations</h3><p data-animation-phase></p></div><button type="button" class="animation-toggle" data-animation-toggle>Pause</button></div>
       <ForecastDemonstrations />
+      <div class="mobile-layer-summary">
+        <div data-mobile-layer="observations">
+          <p>Start with measurements collected over time. Check for gaps and unusual readings, then turn recent values into useful inputs for the model.</p>
+          <ol><li>Collect historical readings</li><li>Check and prepare the data</li><li>Build inputs such as recent averages</li></ol>
+        </div>
+        <div data-mobile-layer="forecast">
+          <p>A model learns patterns from historical inputs and known outcomes. It uses those patterns to estimate what comes next.</p>
+          <ol><li>Make a prediction</li><li>Compare it with the known outcome</li><li>Adjust the model to reduce the error</li></ol>
+        </div>
+        <div data-mobile-layer="uncertainty">
+          <p>A forecast is an estimate. A range of plausible outcomes shows how much the future could differ from the central prediction.</p>
+          <ol><li>Consider several possible outcomes</li><li>Show a central estimate</li><li>Use a wider band for greater uncertainty</li></ol>
+        </div>
+        <p class="mobile-explorer-note">Explore the full animation on desktop.</p>
+      </div>
       <p class="illustration-note">Illustrative data &middot; educational model</p>
     </section>
   </div>
 </dialog>
 <style>
-  .forecast-explorer { width: min(1180px,calc(100% - 3rem)); max-width: none; height: calc(100dvh - 3rem); max-height: calc(100dvh - 3rem); margin: auto; padding: 0; border: 1px solid var(--line); color: var(--color-text-primary); background: var(--color-bg-primary); overscroll-behavior: contain; overflow-anchor: none; }
+  .forecast-explorer { width: min(73.75rem,calc(100% - 3rem)); max-width: none; height: calc(100dvh - 3rem); max-height: calc(100dvh - 3rem); margin: auto; padding: 0; border: 1px solid var(--line); color: var(--color-text-primary); background: var(--color-bg-primary); overscroll-behavior: contain; overflow-anchor: none; }
   .forecast-explorer[open] { animation: explorer-expand 420ms cubic-bezier(.22,1,.36,1) both; }
   .forecast-explorer[open]::backdrop { animation: explorer-backdrop 420ms ease-out both; }
   @keyframes explorer-expand { from { opacity: 0; transform: translateY(20px) scale(.94); } to { opacity: 1; transform: none; } }
@@ -46,7 +61,7 @@ const layers = forecastLayers(1);
   .explorer-close:hover { border-color: var(--color-accent); }
   .explorer-body { padding: 0 2rem 1rem; }
   .layer-overview { background: var(--color-bg-primary); border-bottom: 1px solid var(--line); }
-  .layer-diagram { position: relative; height: clamp(340px,48vh,470px); background: radial-gradient(ellipse at 38% 50%,#d7a1840e,transparent 68%); }
+  .layer-diagram { position: relative; height: clamp(21.25rem,48dvh,29.375rem); background: radial-gradient(ellipse at 38% 50%,#d7a1840e,transparent 68%); }
 
   .layer-choice { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; pointer-events: none; }
   .layer-choice svg { width: 100%; height: 100%; display: block; overflow: visible; }
@@ -60,7 +75,7 @@ const layers = forecastLayers(1);
   .layer-dot { fill: #ede5d8; }.layer-curve { stroke: #e7b390; stroke-width: 2.5; }
   .layer-band { fill: #d7a18440; stroke: var(--color-accent); stroke-width: 1; }.layer-center { stroke: var(--color-accent); stroke-dasharray: 4 6; }
   .layer-leader { stroke: #a5ad9770; stroke-width: 1; }
-  .layer-caption { position: absolute; left: 73%; right: 0; top: var(--label-top); transform: translateY(-50%); min-height: 44px; display: flex; align-items: center; justify-content: space-between; padding: .4rem .6rem; text-align: left; pointer-events: auto; color: var(--color-text-secondary); }
+  .layer-caption { position: absolute; left: 73%; right: 0; top: var(--label-top); transform: translateY(-50%); min-height: 2.75rem; display: flex; align-items: center; justify-content: space-between; padding: .4rem .6rem; text-align: left; pointer-events: auto; color: var(--color-text-secondary); }
   .layer-caption span { color: var(--color-accent); margin-left: .5rem; }
   .layer-choice[aria-pressed="true"] .layer-caption { color: var(--color-accent); border-bottom: 2px solid var(--color-accent); }
   .layer-instruction { margin: 0; padding: 0 0 1rem; text-align: center; font: var(--text-ui)/1.6 var(--font-body); color: var(--color-text-secondary); }
@@ -71,8 +86,37 @@ const layers = forecastLayers(1);
   .animation-toggle { padding: .6rem 1rem; border: 1px solid var(--line); min-width: 6rem; }
   .animation-toggle:hover { border-color: var(--color-accent); }
   .illustration-note { margin: 1rem 0 0; text-align: right; font: var(--text-meta)/1.6 var(--font-mono); color: var(--color-text-secondary); }
-  @media(max-width: 600px) { .forecast-explorer { width: calc(100% - 1rem); height: calc(100dvh - 1rem); max-height: calc(100dvh - 1rem); } .explorer-header { padding: .8rem 1rem; } .explorer-header h2 { font-size: var(--text-lead); } .explorer-body { padding: 0 1rem 1rem; } .layer-choice svg { width: 88%; } .layer-caption { left: 65%; padding: .3rem 0; font: var(--text-ui)/1.5 var(--font-body); } .layer-caption span { display: none; } .layer-diagram { height: 340px; } }
-  .layer-demonstration { min-height: calc(100dvh - var(--explorer-header-height,90px) - 5rem); }
+  @media(max-width: 37.5em) { .forecast-explorer { width: calc(100% - 1rem); height: calc(100dvh - 1rem); max-height: calc(100dvh - 1rem); } .explorer-header { padding: .8rem 1rem; } .explorer-header h2 { font-size: var(--text-lead); } .explorer-body { padding: 0 1rem 1rem; } .layer-choice svg { width: 88%; } .layer-caption { left: 65%; padding: .3rem 0; font: var(--text-ui)/1.5 var(--font-body); } .layer-caption span { display: none; } .layer-diagram { height: 21.25rem; } }
+  .layer-demonstration { min-height: calc(100dvh - var(--explorer-header-height,5.625rem) - 5rem); }
+  .mobile-layer-summary, .mobile-layer-instruction { display: none; }
+  @media (max-width: 47.9375em) {
+    .forecast-explorer { container: forecast / inline-size; }
+    .layer-diagram { height: 16.25rem; }
+    .explorer-header { flex-wrap: wrap; }
+    .layer-caption { overflow-wrap: anywhere; }
+    .desktop-layer-instruction { display: none; }
+    .mobile-layer-instruction { display: inline; }
+    .demonstration-header { padding-top: 1rem; }
+    .layer-demonstration { min-height: 0; padding-bottom: 1rem; }
+    .animation-toggle, [data-animation-phase], .illustration-note { display: none; }
+    .forecast-explorer :global(.forecast-demonstrations) { display: none; }
+    .mobile-layer-summary { display: block; font: var(--text-body)/var(--leading-body) var(--font-body); }
+    [data-mobile-layer] { display: none; }
+    .forecast-explorer[data-selected="observations"] [data-mobile-layer="observations"],
+    .forecast-explorer[data-selected="forecast"] [data-mobile-layer="forecast"],
+    .forecast-explorer[data-selected="uncertainty"] [data-mobile-layer="uncertainty"] { display: block; }
+    .mobile-layer-summary ol { padding-left: 1.4rem; }
+    .mobile-layer-summary li { padding: .25rem 0; }
+    .mobile-explorer-note { margin: 1.25rem 0 0; color: var(--color-text-secondary); font-size: var(--text-meta); }
+  }
+  /* At large text sizes, labelled buttons stay readable in the available width. */
+  @container forecast (max-width: 20rem) {
+    .explorer-header > div > span { display: none; }
+    .layer-diagram { display: grid; height: auto; padding: 1rem 0; gap: .5rem; }
+    .layer-choice { position: relative; inset: auto; height: auto; pointer-events: auto; }
+    .layer-choice svg { display: none; }
+    .layer-caption { position: static; transform: none; padding: .5rem; min-height: 2.75rem; }
+  }
 </style>
 <script>
   import { createDemonstration, demonstrationLayers, type DemonstrationLayer } from '../lib/forecastDemonstrations';
@@ -84,11 +128,12 @@ const layers = forecastLayers(1);
   const toggle=dialog.querySelector<HTMLButtonElement>('[data-animation-toggle]')!;
   const renderer=createDemonstration(dialog.querySelector<HTMLElement>('.forecast-demonstrations')!,phase);
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile=matchMedia('(max-width: 47.9375em)');
   let scrollFrame=0;
   function stopScroll(){cancelAnimationFrame(scrollFrame);scrollFrame=0;}
   function scrollToDemonstration(top:number){
     stopScroll();
-    if(motion.matches){dialog.scrollTo({top,behavior:'instant'});return;}
+    if(motion.matches||mobile.matches){dialog.scrollTo({top,behavior:'instant'});return;}
     const from=dialog.scrollTop;
     let start:number|null=null;
     const step=(now:number)=>{
@@ -107,21 +152,21 @@ const layers = forecastLayers(1);
   let opener: HTMLButtonElement|null=null, previousOverflow='';
   function draw(time:number) {
     frame=0;
-    if(!dialog.open||document.hidden||paused||!selected)return;
+    if(!dialog.open||document.hidden||mobile.matches||paused||!selected)return;
     if(previous)elapsed+=Math.min(time-previous,64);
     previous=time;renderer.render(elapsed);frame=requestAnimationFrame(draw);
   }
   function schedule() {
     cancelAnimationFrame(frame);frame=0;previous=0;
     toggle.textContent=paused?'Play':'Pause';
-    if(dialog.open&&!document.hidden&&!paused&&selected)frame=requestAnimationFrame(draw);
+    if(dialog.open&&!document.hidden&&!mobile.matches&&!paused&&selected)frame=requestAnimationFrame(draw);
   }
   function select(layer: DemonstrationLayer|null) {
     stopScroll();selected=layer;elapsed=0;paused=motion.matches;
     if(layer)dialog.dataset.selected=layer;else delete dialog.dataset.selected;
     choices.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.layerChoice===layer)));
     renderer.select(layer);demonstration.hidden=layer===null;
-    if(layer){title.textContent=demonstrationLayers.find(item=>item.id===layer)!.label;elapsed=motion.matches?(layer==='forecast'?13200:layer==='observations'?13000:6500):0;renderer.render(elapsed);}
+    if(layer){title.textContent=demonstrationLayers.find(item=>item.id===layer)!.label;elapsed=motion.matches?(layer==='forecast'?13200:layer==='observations'?13000:6500):0;if(!mobile.matches)renderer.render(elapsed);}
     if(layer){
       title.focus({preventScroll:true});
       const top=demonstration.getBoundingClientRect().top-dialog.getBoundingClientRect().top+dialog.scrollTop-header.offsetHeight-dialog.clientTop;
@@ -142,5 +187,6 @@ const layers = forecastLayers(1);
   dialog.addEventListener('close',()=>{stopScroll();schedule();document.documentElement.style.overflow=previousOverflow;opener?.focus({preventScroll:true});});
   dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();});
   document.addEventListener('visibilitychange',schedule);
+  mobile.addEventListener('change',()=>{if(dialog.open)select(selected);else schedule();});
   motion.addEventListener('change',()=>{if(motion.matches){stopScroll();paused=true;if(selected){elapsed=selected==='forecast'?13200:selected==='observations'?13000:6500;renderer.render(elapsed);}}schedule();});
 </script>

@@ -3,6 +3,7 @@ const base = import.meta.env.BASE_URL; // '/Online-Portfolio-Private' (no traili
 const path = Astro.url.pathname;
 
 const links = [
+  { label: 'HOME', href: `${base}/`, match: [''] },
   { label: 'PROJECTS', href: `${base}/projects`, match: ['projects'] },
   { label: 'EXPERIENCES', href: `${base}/experience`, match: ['experience'] },
 ];
@@ -22,7 +23,7 @@ function isActive(match: string[]) {
 ---
 <nav id="mainNav" class:list={['navbar', pageClass]}>
   <div class="navbar-container">
-    <a href={`${base}/`} class="navbar-brand" aria-label="Aarron Loke ? home">Aarron Loke</a>
+    <a href={`${base}/`} class="navbar-brand" aria-label="Aarron Loke home">Aarron Loke</a>
     <div class="navbar-menu">
       <ul class="navbar-links">
         {links.map((l) => (

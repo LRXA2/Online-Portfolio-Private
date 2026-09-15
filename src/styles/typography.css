@@ -1,10 +1,20 @@
 /* Semantic assignments shared by every page. Token values live in global.css. */
+@media (max-width: 47.9375em) {
+  :root {
+    --text-body: 1.0625rem;
+    --text-lead: 1.25rem;
+    --text-title: 1.5rem;
+    --text-section: clamp(1.75rem, 6vw, 2rem);
+    --text-page: clamp(2.25rem, 9vw, 3rem);
+    --leading-body: 1.65;
+  }
+}
 body :is(.lead-exp__body, .featured-note, .work-blurb, .row-blurb,
   .proj-hero__intro, .role__desc, .role__ref-body p, .dialog-summary,
   .dossier-cover__body p:not(.dossier-eyebrow), .dossier-notes p,
   .dossier-recognition p, .dossier-gallery-section > p,
-  .retrieval-visual p:not(.dossier-eyebrow), .dossier-placeholder figcaption,
-  .dossier-gallery figcaption, .edu-degree, .edu-school, .cert-name) {
+  .retrieval-visual p:not(.dossier-eyebrow), .dossier-workflow figcaption,
+  .dossier-gallery figcaption, .dossier-media-credit, .edu-degree, .edu-school, .cert-name) {
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
@@ -79,3 +89,11 @@ body .role__title {
   letter-spacing: normal;
 }
 body .role__ref-author { font: 600 var(--text-ui)/1.5 var(--font-body); }
+
+/* Landing-page section labels share the same size, case, and spacing. */
+body .featured :is(.section-label, .edu .edu-kicker) {
+  display: block;
+  font-size: var(--text-ui);
+  text-transform: uppercase;
+  margin: 0 0 .75rem;
+}

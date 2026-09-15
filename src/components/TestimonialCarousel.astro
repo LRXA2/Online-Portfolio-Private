@@ -22,8 +22,13 @@ const base = import.meta.env.BASE_URL;
     <button class="quote-nav quote-nav--next" type="button" aria-label="Next testimonial" aria-controls="testimonial-track"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M4 12h16m-7-7 7 7-7 7" /></svg></button>
   </div>
   <div class="quote-controls" hidden>
-    <div class="quote-selectors" role="group" aria-label="Select a testimonial">
+    <div class="quote-choice-navigation">
+    <div id="testimonial-choices" class="quote-selectors" role="group" aria-label="Select a testimonial">
       {testimonials.map((t) => <button type="button" aria-label={`Show testimonial: ${t.placement}, ${t.designation}`} aria-controls="testimonial-track"><span class="quote-selector-placement">{t.placement}</span><span class="quote-selector-designation">{t.designation}</span></button>)}
+    </div>
+      <div class="quote-scrollbar">
+        <input type="range" min="0" max="100" step="0.1" value="0" aria-label="Scroll testimonial choices" aria-controls="testimonial-choices" />
+      </div>
     </div>
     <span class="quote-status" role="status" aria-live="polite" aria-atomic="true"></span>
   </div>
@@ -52,27 +57,43 @@ const base = import.meta.env.BASE_URL;
   .quote-selector-designation { display: block; margin-top: .35rem; font-size: var(--text-meta); line-height: 1.5; }
   .quote-preview { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; cursor: pointer; }
   .quote-nav { display: none; }
-  [data-ready] .quote-nav { position: absolute; top: 50%; z-index: 4; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--color-accent); background: var(--color-bg-primary); color: var(--color-accent); font: var(--text-lead)/1 var(--font-body); transform: translateY(-50%); cursor: pointer; }
+  [data-ready] .quote-nav { position: absolute; top: 50%; z-index: 4; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 1px solid var(--color-accent); background: var(--color-bg-primary); color: var(--color-accent); font: var(--text-lead)/1 var(--font-body); transform: translateY(-50%); cursor: pointer; }
   .quote-nav--previous { left: .25rem; }
-  .quote-nav svg { display: block; width: 24px; height: 24px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .quote-nav svg { display: block; width: 1.5rem; height: 1.5rem; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .quote-nav--next { right: .25rem; }
   [data-ready] .quote-nav[hidden] { display: none; }
   .quote-controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .75rem 1.25rem; margin-top: .5rem; }
   .quote-controls[hidden], .quote-preview[hidden] { display: none; }
+  .quote-choice-navigation { display: contents; }
+  .quote-scrollbar { display: none; }
   .quote-selectors { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: .5rem 1rem; }
-  .quote-selectors button { min-width: 44px; min-height: 44px; padding: .5rem; background: transparent; border-bottom: 2px solid var(--line); color: var(--color-text-secondary); font: var(--text-ui)/1.5 var(--font-body); cursor: pointer; }
+  .quote-selectors button { min-width: 2.75rem; min-height: 2.75rem; padding: .5rem; background: transparent; border-bottom: 2px solid var(--line); color: var(--color-text-secondary); font: var(--text-ui)/1.5 var(--font-body); cursor: pointer; }
   .quote-selectors button:hover { color: var(--color-accent); border-color: var(--color-accent); }
   .quote-selectors button[aria-current="true"] { background: transparent; border-color: var(--color-accent); color: var(--color-accent); }
   .quote-status { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   :is(button, a):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
   .quote-stage:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
-  @media (max-width: 600px) {
-    [data-ready] .quote-stage { padding-inline: 7%; }
-    .quote-content { padding: 1.25rem; }
-    .quote-selectors { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
-    blockquote { font-size: var(--text-body); }
+  @media (max-width: 47.9375em) {
+    [data-ready] .quote-stage { padding: .5rem 0; }
+    [data-ready] .quote-nav { display: none; }
+    [data-ready] .quote-slide:not([data-position="active"]) { visibility: hidden; }
+    .quote-content { padding: 1rem; }
+    .quote-choice-navigation { display: block; position: relative; width: 100%; min-width: 0; }
+    .quote-selectors { display: flex; width: 100%; gap: .75rem; padding: .25rem; overflow-x: auto; scrollbar-width: none; }
+    .quote-selectors::-webkit-scrollbar { display: none; }
+    .quote-selectors button { flex: 0 0 auto; min-width: 12rem; padding: .5rem .75rem; }
+    .quote-selector-placement, .quote-selector-designation { white-space: nowrap; }
+    .quote-selector-designation { margin-top: .15rem; }
+    .quote-scrollbar { display: block; margin-top: .25rem; padding-inline: .25rem; }
+    .quote-scrollbar input { display: block; appearance: none; width: 100%; height: 2.75rem; margin: 0; background: transparent; cursor: ew-resize; }
+    .quote-scrollbar input::-webkit-slider-runnable-track { height: .375rem; background: var(--line); border-radius: .25rem; }
+    .quote-scrollbar input::-moz-range-track { height: .375rem; background: var(--line); border-radius: .25rem; }
+    .quote-scrollbar input::-webkit-slider-thumb { appearance: none; width: 2.75rem; height: .625rem; margin-top: -.125rem; border: 0; border-radius: .25rem; background: var(--color-accent); }
+    .quote-scrollbar input::-moz-range-thumb { width: 2.75rem; height: .625rem; border: 0; border-radius: .25rem; background: var(--color-accent); }
+    .quote-scrollbar input:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 0; }
+    blockquote { font-size: var(--text-lead); }
   }
-  @media (prefers-reduced-motion: reduce) { [data-ready] .quote-slide { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { [data-ready] .quote-slide, .quote-selectors button::after { transition: none; } }
 </style>
 
 <script>
@@ -86,6 +107,21 @@ const base = import.meta.env.BASE_URL;
       this.listeners?.abort();
       this.listeners = new AbortController();
       const { signal } = this.listeners;
+      const choiceStrip = this.querySelector<HTMLElement>('.quote-selectors')!;
+      const scrollbar = this.querySelector<HTMLInputElement>('.quote-scrollbar input')!;
+      const updateScrollbar = () => {
+        const end = Math.max(0, choiceStrip.scrollWidth - choiceStrip.clientWidth);
+        scrollbar.value = String(end ? choiceStrip.scrollLeft / end * 100 : 0);
+        scrollbar.disabled = end === 0;
+      };
+      scrollbar.addEventListener('input', () => {
+        choiceStrip.scrollLeft = Number(scrollbar.value) / 100 * (choiceStrip.scrollWidth - choiceStrip.clientWidth);
+      }, { signal });
+      choiceStrip.addEventListener('scroll', updateScrollbar, { passive: true, signal });
+      this.choiceResizeObserver?.disconnect();
+      this.choiceResizeObserver = new ResizeObserver(updateScrollbar);
+      this.choiceResizeObserver.observe(choiceStrip);
+      selectors.forEach(button => this.choiceResizeObserver!.observe(button));
       let active = 0;
       let gesture: { x: number; y: number; id: number; dragging: boolean } | undefined;
       let swiped = false;
@@ -113,7 +149,7 @@ const base = import.meta.env.BASE_URL;
       selectors.forEach((button, index) => button.addEventListener('click', () => select(index), { signal }));
       slides.forEach((slide, index) => slide.querySelector('button')!.addEventListener('click', () => select(index), { signal }));
       this.addEventListener('keydown', (event) => {
-        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.altKey || event.ctrlKey || event.metaKey || (event.target as Element).closest('.quote-scrollbar')) return;
         const targets: Record<string, number> = { ArrowLeft: active - 1, ArrowRight: active + 1, Home: 0, End: slides.length - 1 };
         if (!(event.key in targets)) return;
         event.preventDefault();
@@ -163,7 +199,8 @@ const base = import.meta.env.BASE_URL;
       controls.hidden = slides.length < 2;
     }
     private listeners?: AbortController;
-    disconnectedCallback() { this.listeners?.abort(); }
+    private choiceResizeObserver?: ResizeObserver;
+    disconnectedCallback() { this.listeners?.abort(); this.choiceResizeObserver?.disconnect(); }
   }
   if (!customElements.get('testimonial-carousel')) customElements.define('testimonial-carousel', TestimonialCarousel);
 </script>

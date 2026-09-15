@@ -3,19 +3,20 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-size: 16px; /* Base font size for rem calculations */
+  font-size: 100%; /* Respect the browser default and inherit it on body. */
 }
 
 /* ==================== */
 /* FEATURED WORK (landing, below hero) */
 /* ==================== */
 .featured {
+  --text-section: clamp(2.25rem, 4.5vw, 3.375rem);
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   padding: clamp(4rem, 10vw, 7.5rem) clamp(1.4rem, 5vw, 4rem);
 }
 .featured-inner {
-  max-width: 1120px;
+  max-width: 70rem;
   margin: 0 auto;
 }
 
@@ -36,6 +37,8 @@ html, body {
 }
 
 .featured-more {
+  max-width: 100%;
+  overflow-wrap: anywhere;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;

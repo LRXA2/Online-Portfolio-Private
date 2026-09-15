@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Secretary Agent: two interfaces, shared capabilities</title>
+  <desc id="desc">Telegram and a React dashboard call shared Python application capabilities through feature handlers and FastAPI. APScheduler runs configured jobs. Adapters connect to SQLite, Obsidian, model providers, Google services, and news and weather feeds. Optional companion file search is a separate service.</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ede5d8" stroke-opacity=".035"/></pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#d7a184" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="1400" height="1000" fill="#181918"/>
+  <rect width="1400" height="1000" fill="url(#grid)"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#ede5d8">
+    <text x="64" y="76" font-size="18" letter-spacing="3" fill="#d7a184">SECRETARY AGENT / SYSTEM ARCHITECTURE</text>
+    <text x="64" y="140" font-size="46">One application, wherever the thought starts.</text>
+    <text x="64" y="184" font-size="25" fill="#b7b4a9">Quick interactions in Telegram. Space to review in the browser.</text>
+    <g stroke="#716458" fill="#222421">
+      <rect x="64" y="230" width="604" height="126"/>
+      <rect x="732" y="230" width="604" height="126"/>
+    </g>
+    <text x="96" y="280" font-size="30">Telegram</text>
+    <text x="96" y="320" font-size="23" fill="#b7b4a9">Commands, workspaces, inline review</text>
+    <text x="764" y="280" font-size="30">React dashboard</text>
+    <text x="764" y="320" font-size="23" fill="#b7b4a9">Today, tasks, calendar, notes, capture</text>
+    <g stroke="#d7a184" stroke-width="2" fill="none" marker-end="url(#arrow)">
+      <path d="M366 356 V426"/>
+      <path d="M1034 356 V426"/>
+    </g>
+    <rect x="64" y="428" width="1272" height="226" fill="#272722" stroke="#d7a184"/>
+    <text x="96" y="472" font-size="18" letter-spacing="2" fill="#d7a184">PYTHON APPLICATION / ONE PROCESS</text>
+    <text x="96" y="520" font-size="32">Shared use cases + capability registry</text>
+    <text x="96" y="558" font-size="24" fill="#b7b4a9">Telegram handlers and FastAPI routes reuse application operations.</text>
+    <path d="M96 582 H1304" stroke="#716458"/>
+    <text x="96" y="621" font-size="24">APScheduler</text>
+    <text x="340" y="621" font-size="23" fill="#b7b4a9">Configured reminders, digests, and integration jobs</text>
+    <path d="M700 654 V706" stroke="#d7a184" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="64" y="700" font-size="18" letter-spacing="2" fill="#d7a184">PERSISTENCE &amp; SERVICE ADAPTERS</text>
+    <g stroke="#716458" fill="#222421">
+      <rect x="64" y="724" width="404" height="176"/>
+      <rect x="498" y="724" width="404" height="176"/>
+      <rect x="932" y="724" width="404" height="176"/>
+    </g>
+    <text x="90" y="770" font-size="28">Keep the state</text>
+    <text x="90" y="813" font-size="23" fill="#b7b4a9">SQLite application data</text>
+    <text x="90" y="850" font-size="23" fill="#b7b4a9">Obsidian notes</text>
+    <text x="524" y="770" font-size="28">Choose the models</text>
+    <text x="524" y="813" font-size="23" fill="#b7b4a9">Ollama / llama.cpp</text>
+    <text x="524" y="850" font-size="23" fill="#b7b4a9">Compatible servers / speech</text>
+    <text x="958" y="770" font-size="28">Connect the services</text>
+    <text x="958" y="813" font-size="23" fill="#b7b4a9">Google Calendar / Gmail</text>
+    <text x="958" y="850" font-size="23" fill="#b7b4a9">News / Singapore weather</text>
+    <text x="64" y="954" font-size="22" fill="#b7b4a9">Integrations are configurable. Optional companion file search runs as a separate service.</text>
+  </g>
+</svg>

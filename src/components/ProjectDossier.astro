@@ -1,6 +1,7 @@
-﻿---
+---
 import type { Project, ProjectDetail } from '../data/projects';
 import '../styles/dossier.css';
+import DescriptionText from './DescriptionText.astro';
 interface Props { project: Project; detail: ProjectDetail; dialogOnly?: boolean }
 const { project, detail, dialogOnly = false } = Astro.props;
 const assetUrl = (path: string) => import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + path;
@@ -9,24 +10,24 @@ const id = `dossier-${project.slug}`;
 {!dialogOnly && <article class="dossier-cover">
   <div class="dossier-cover__body">
     <div>
-      <p class="dossier-eyebrow">{detail.eyebrow} <span aria-hidden="true">&middot;</span> {project.year}</p>
+      <p class="dossier-eyebrow">{detail.eyebrow}{project.status && <span> / {project.status}</span>} <span aria-hidden="true">&middot;</span> {project.year}</p>
       <h3>{project.name}</h3>
-      {detail.recognition && <a class="dossier-featured" href={detail.recognition.url} target="_blank" rel="noopener noreferrer">{detail.recognition.label} &#8599;</a>}
-      <p>{project.blurb}</p>
+      <p><DescriptionText text={project.blurb} link={detail.recognition} /></p>
       <ul class="dossier-stack">{project.stack.map(s => <li>{s}</li>)}</ul>
     </div>
   </div>
   <div class="dossier-actions">
     <button type="button" data-open-dossier={id} aria-haspopup="dialog">Open project dossier <span aria-hidden="true">↗</span></button>
     {project.repo && <a href={project.repo} target="_blank" rel="noopener noreferrer">View repository ↗</a>}
+    {project.eventUrl && <a href={project.eventUrl} target="_blank" rel="noopener noreferrer" aria-label={`${project.event || project.name} website`}>Website <span aria-hidden="true">&#8599;</span></a>}
   </div>
 </article>}
 <dialog id={id} class="project-dialog" aria-labelledby={`${id}-title`}>
   <div class="dialog-toolbar"><span>PROJECT DOSSIER / {project.year}</span><button type="button" data-close-dossier autofocus aria-label="Close project dossier">Close ×</button></div>
   <div class="dialog-content">
-    <p class="dossier-eyebrow">{detail.eyebrow}</p>
+    <p class="dossier-eyebrow">{detail.eyebrow}{project.status && <span> / {project.status}</span>}</p>
     <h2 id={`${id}-title`}>{project.name}</h2>
-    <p class="dialog-summary">{project.blurb}</p>
+    <p class="dialog-summary"><DescriptionText text={project.blurb} link={detail.recognition} /></p>
     <ul class="dossier-stack">{project.stack.map(s => <li>{s}</li>)}</ul>
     {detail.recognition && <aside class="dossier-recognition" aria-label="Recognition">
       <span class="dossier-eyebrow">RECOGNITION / {detail.recognition.year}</span>
@@ -35,7 +36,7 @@ const id = `dossier-${project.slug}`;
     </aside>}
     {detail.galleries?.map(gallery => <section class="dossier-gallery-section" aria-label={gallery.title}>
       <h3>{gallery.title}</h3><p>{gallery.description}</p>
-      <div class:list={['dossier-gallery', { 'dossier-gallery--components': gallery.images.length > 2 }]}>
+      <div class:list={['dossier-gallery', { 'dossier-gallery--components': gallery.images.length > 2 && gallery.layout !== 'wide', 'dossier-gallery--wide': gallery.layout === 'wide' }]}>
         {gallery.images.map(img => <figure>
           <a href={assetUrl(img.src)} target="_blank" rel="noopener noreferrer" aria-label={'Open full-size image: ' + img.caption}>
             <img src={assetUrl(img.src)} alt={img.alt} width={img.width} height={img.height} loading="lazy" decoding="async" />
@@ -59,7 +60,7 @@ const id = `dossier-${project.slug}`;
         <p>{detail.pipeline.example.explanation}</p>
       </aside>
     </section>}
-    <figure class="dossier-placeholder">
+    <figure class="dossier-workflow">
       <span class="dossier-eyebrow">{detail.workflowLabel}</span>
       <p>{detail.workflowTitle}</p>
       <div class="dossier-flow">{detail.steps.map((step, i) => <>{i > 0 && <span aria-hidden="true">&#8594;</span>}<span>{step}</span></>)}</div>
@@ -68,6 +69,12 @@ const id = `dossier-${project.slug}`;
     <div class="dossier-notes">
       {detail.notes.map(note => <section><span class="dossier-eyebrow">{note.label}</span><h3>{note.title}</h3><p>{note.body}</p></section>)}
     </div>
+    {detail.additionalFeatures && <section class="dossier-features" aria-labelledby={`${id}-features-title`}>
+      <h3 id={`${id}-features-title`}>{detail.additionalFeatures.title}</h3>
+      <dl>
+        {detail.additionalFeatures.items.map(item => <div><dt>{item.label}</dt><dd>{item.body}</dd></div>)}
+      </dl>
+    </section>}
     {project.eventUrl && <a class="dossier-repo" href={project.eventUrl} target="_blank" rel="noopener noreferrer">Visit the hackathon website &#8599;</a>}
     {project.repo && <a class="dossier-repo" href={project.repo} target="_blank" rel="noopener noreferrer">Explore the repository ↗</a>}
   </div>
@@ -77,10 +84,18 @@ const id = `dossier-${project.slug}`;
     const dialog = document.getElementById(button.dataset.openDossier!) as HTMLDialogElement | null;
     if (!dialog) return;
     let previousOverflow = '';
+    let motionCleanup: (() => void) | undefined;
+    let opening = 0;
     button.addEventListener('click', () => {
       previousOverflow = document.documentElement.style.overflow;
       dialog.showModal();
       document.documentElement.style.overflow = 'hidden';
+      const currentOpening = ++opening;
+      if (dialog.querySelector('.dossier-gallery--wide')) {
+        void import('../lib/dossierMotion').then(({ animateDossier }) => {
+          if (dialog.open && currentOpening === opening) motionCleanup = animateDossier(dialog);
+        }).catch(() => { /* The dossier remains readable if its optional animation cannot load. */ });
+      }
     });
     dialog.querySelector('[data-close-dossier]')?.addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', event => {
@@ -89,6 +104,9 @@ const id = `dossier-${project.slug}`;
       if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
     });
     dialog.addEventListener('close', () => {
+      opening++;
+      motionCleanup?.();
+      motionCleanup = undefined;
       document.documentElement.style.overflow = previousOverflow;
       button.focus({ preventScroll: true });
     });

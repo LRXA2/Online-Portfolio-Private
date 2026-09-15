@@ -1,0 +1,37 @@
+// Run with the Playwright browser_run_code tool's filename argument against npm run dev.
+async (page) => {
+  const check = (value, message) => { if (!value) throw new Error(message); };
+  await page.goto('http://127.0.0.1:4321/Online-Portfolio-Private/projects');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const original = await page.locator('.proj-row').evaluateAll(rows => rows.map(row => row.id));
+  const year = page.getByRole('button', { name: 'Year', exact: true });
+  check(await year.count() === 1, 'Projects must offer a Year view button');
+  const firstHeadingTop = await page.locator('#internship').evaluate(element => element.getBoundingClientRect().top + scrollY);
+  await year.click();
+  check(Math.abs(await page.locator('#year-2026').evaluate(element => element.getBoundingClientRect().top + scrollY) - firstHeadingTop) < 1, 'First year header must keep the first category header position');
+  check(JSON.stringify(await page.locator('.section-nav a:visible').allTextContents()) === JSON.stringify(['2026', '2025', '2024', '2023', '2022']), 'Year navigation must run newest to oldest');
+  check(await page.locator('#year-2025 #reminder-agent').count() === 1, 'Ongoing Secretary Agent belongs to its starting year, 2025');
+  check(await page.locator('#year-2026 #attrition-risk-classifier').count() === 1, '2026 projects belong in the newest group');
+  const reordered = await page.locator('.proj-row').evaluateAll(rows => rows.map(row => row.id));
+  check(original.length === reordered.length && new Set(reordered).size === original.length, 'Switching must preserve every project exactly once');
+  check(await year.getAttribute('aria-pressed') === 'true', 'Selected view must be accessible');
+  await page.getByRole('button', { name: 'Category', exact: true }).click();
+  check(JSON.stringify(await page.locator('.proj-row').evaluateAll(rows => rows.map(row => row.id))) === JSON.stringify(original), 'Category view must restore original grouping and order');
+  await year.click();
+  const opener = page.locator('#reminder-agent').getByRole('button', { name: 'Open dossier' });
+  await opener.click();
+  check(await page.locator('#dossier-reminder-agent').isVisible(), 'Moved projects must still open their dossier');
+  await page.keyboard.press('Escape');
+  check(await opener.evaluate(element => element === document.activeElement), 'Closing the dossier must restore focus to its moved opener');
+  await page.locator('.section-nav').getByRole('link', {name: '2023', exact: true}).click();
+  await page.waitForFunction(() => document.querySelector('.section-nav a[aria-current]')?.textContent === '2023');
+  check(await page.locator('.section-nav a[aria-current]').textContent() === '2023', 'Navigation must track the selected year section');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.getByRole('button', { name: 'Category', exact: true }).click();
+  await year.click();
+  await page.getByRole('button', { name: 'Category', exact: true }).click();
+  await page.waitForFunction(() => [...document.querySelectorAll('.proj-row')].every(row => getComputedStyle(row).transform === 'none'));
+  check(JSON.stringify(await page.locator('.proj-row').evaluateAll(rows => rows.map(row => row.id))) === JSON.stringify(original), 'Rapid toggles must settle on the final requested view');
+  check(await page.locator('.proj-row').evaluateAll(rows => rows.every(row => getComputedStyle(row).transform === 'none')), 'Finished transitions must leave no row transforms');
+  return { passed: true, projects: original.length };
+}
