@@ -1,5 +1,6 @@
-// Run with browser_run_code's filename argument against the local Astro server.
-async (page) => {
+import { test } from '@playwright/test';
+
+test("mobileForecast", async ({ page }) => {
   await page.bringToFront();
   const renderingChanges = () => page.locator('.forecast-demonstrations').evaluate(async root => {
     // Let responsive media-query handlers finish before measuring steady rendering.
@@ -14,7 +15,7 @@ async (page) => {
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto('http://localhost:4321/Online-Portfolio-Private/');
+  await page.goto('./');
   await page.locator('[data-open-forecast]').click();
   for (const layer of ['observations', 'forecast', 'uncertainty']) {
     await page.locator(`[data-layer-choice="${layer}"] .layer-caption`).click();
@@ -35,4 +36,4 @@ async (page) => {
   await page.getByRole('button', { name: 'Close forecast explorer' }).click();
   if (!await page.locator('[data-open-forecast]').evaluate(el => el === document.activeElement)) throw new Error('Closing must return focus to the opener');
   return { passed: true };
-}
+});

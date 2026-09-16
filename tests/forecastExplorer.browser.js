@@ -1,10 +1,10 @@
-// Playwright browser_run_code_unsafe filename test; requires localhost:4321.
-// Replaces the drilldown/rotation test after the user explicitly removed those behaviors.
-async (page) => {
+import { test } from '@playwright/test';
+
+test("forecastExplorer", async ({ page }) => {
   const assert=(ok,message)=>{if(!ok)throw new Error(message);};
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.setViewportSize({width:1440,height:1000});
-  await page.goto('http://localhost:4321/Online-Portfolio-Private/');
+  await page.goto('./');
   const opener=page.getByRole('button',{name:'Explore anatomy of a forecast',exact:true});
   await opener.focus();await page.keyboard.press('Enter');
   const dialog=page.getByRole('dialog',{name:'Anatomy of a forecast',exact:true});
@@ -18,18 +18,21 @@ async (page) => {
       const button=choices.getByRole('button',{name,exact:true});
       await button.focus();await page.keyboard.press('Enter');
       assert(await button.getAttribute('aria-pressed')==='true',name+' must be selectable');
-      assert(await dialog.locator('[data-demo]:visible').count()===1,'Exactly one demonstration must appear');
+      assert(await dialog.locator(width >= 768 ? '[data-demo]:visible' : '[data-mobile-layer]:visible').count()===1,'Exactly one selected explanation must appear');
       assert(await dialog.getByRole('heading',{name,exact:true}).isVisible(),'Selected scene must be labelled');
-      assert(await choices.locator('.layer-plane').evaluateAll(xs=>xs.every(x=>{const r=x.getBoundingClientRect();if(!r.width||!r.height)return false;for(let n=x;n;n=n.parentElement){const s=getComputedStyle(n);if(s.display==='none'||s.visibility!=='visible'||Number(s.opacity)<.99)return false;if(n.tagName==='DIALOG')break;}return true;})),'All planes must remain visible');
+      if(width >= 768) assert(await choices.locator('.layer-plane').evaluateAll(xs=>xs.every(x=>{const r=x.getBoundingClientRect();if(!r.width||!r.height)return false;for(let n=x;n;n=n.parentElement){const s=getComputedStyle(n);if(s.display==='none'||s.visibility!=='visible'||Number(s.opacity)<.99)return false;if(n.tagName==='DIALOG')break;}return true;})),'All planes must remain visible');
     }
     const labels=await choices.locator('.layer-caption').evaluateAll(xs=>xs.map(x=>({top:x.getBoundingClientRect().top,bottom:x.getBoundingClientRect().bottom})).sort((a,b)=>a.top-b.top));
     assert(labels.every((r,i)=>i===0||r.top>=labels[i-1].bottom),'Layer hit areas must not overlap at '+width);
     assert(await dialog.evaluate(el=>el.scrollWidth<=el.clientWidth+1),'No horizontal dialog overflow at '+width);
-    assert(await dialog.getByRole('button',{name:'Play',exact:true}).isVisible(),'Reduced motion must not autoplay');
+    if(width >= 768) assert(await dialog.getByRole('button',{name:'Play',exact:true}).isVisible(),'Reduced motion must not autoplay');
+    else assert(await dialog.locator('.animation-toggle').isHidden(),'Mobile uses static explanations');
   }
   await page.setViewportSize({width:1440,height:1000});
   // Wait for the sticky header's ResizeObserver after changing viewport width.
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  // Return to the overview before testing a physical pointer hit; selection scrolls it away.
+  await dialog.evaluate(el => el.scrollTo({ top: 0, behavior: 'instant' }));
   // A real pointer click on a plane must select that layer, not an overlaid button.
   const point=await choices.locator('[data-layer-choice="observations"] svg').evaluate(svg=>{
     const points=svg.querySelector('polygon').points;
@@ -64,4 +67,4 @@ async (page) => {
   assert(await page.locator('#forecast-explorer [data-loss]').textContent()===closedLoss,'Closing must stop the clock');
   assert(await page.evaluate(()=>document.documentElement.style.overflow)!=='hidden','Closing must restore page scrolling');
   return 'PASS: flat overview, persistent layers, real hit targets, keyboard, four widths, reduced motion, Pause/Play, training, and close/reset';
-}
+});

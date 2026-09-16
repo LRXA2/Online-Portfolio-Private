@@ -1,6 +1,8 @@
-async(page)=>{
+import { test } from '@playwright/test';
+
+test("forecastExplorerMotion", async ({ page }) => {
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.goto('http://localhost:4321/Online-Portfolio-Private/');
+  await page.goto('./');
   await page.getByRole('button',{name:'Explore anatomy of a forecast'}).click();
   const dialog=page.getByRole('dialog');
   const animated=await dialog.evaluate(el=>getComputedStyle(el).animationName!=='none');
@@ -13,4 +15,4 @@ async(page)=>{
   await page.waitForFunction(()=>{const d=document.querySelector('#forecast-explorer');return d.scrollTop>30;});
   await page.keyboard.press('Escape');
   return 'PASS: animated opening, stable diagram size, scrolling selection';
-}
+});

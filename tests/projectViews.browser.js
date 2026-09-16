@@ -1,7 +1,8 @@
-// Run with the Playwright browser_run_code tool's filename argument against npm run dev.
-async (page) => {
+import { test } from '@playwright/test';
+
+test("projectViews", async ({ page }) => {
   const check = (value, message) => { if (!value) throw new Error(message); };
-  await page.goto('http://127.0.0.1:4321/Online-Portfolio-Private/projects');
+  await page.goto('./projects');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const original = await page.locator('.proj-row').evaluateAll(rows => rows.map(row => row.id));
   const year = page.getByRole('button', { name: 'Year', exact: true });
@@ -34,4 +35,4 @@ async (page) => {
   check(JSON.stringify(await page.locator('.proj-row').evaluateAll(rows => rows.map(row => row.id))) === JSON.stringify(original), 'Rapid toggles must settle on the final requested view');
   check(await page.locator('.proj-row').evaluateAll(rows => rows.every(row => getComputedStyle(row).transform === 'none')), 'Finished transitions must leave no row transforms');
   return { passed: true, projects: original.length };
-}
+});

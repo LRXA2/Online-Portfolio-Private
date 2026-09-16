@@ -1,23 +1,24 @@
+let frame = 0;
+let finish: (() => void) | undefined;
+export function cancelSectionScroll() {
+  cancelAnimationFrame(frame);
+  frame = 0;
+  finish = undefined;
+}
+
+
 /** Animate section anchors explicitly; native smooth scrolling may be disabled by the browser. */
 export function initSectionScrolling() {
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  let frame = 0;
-  let finish: (() => void) | undefined;
-  function cancel() {
-    cancelAnimationFrame(frame);
-    frame = 0;
-    finish = undefined;
-  }
 
   document.addEventListener('click', event => {
     if (!(event.target instanceof Element)) return;
-    if (event.target.closest('[data-project-view]')) cancel();
-    const link = event.target.closest<HTMLAnchorElement>('.section-nav a, .project-bookmarks a');
+    const link = event.target.closest<HTMLAnchorElement>('.section-nav a, [data-section-link]');
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const target = document.getElementById(link.hash.slice(1));
     if (!target) return;
     event.preventDefault();
-    cancel();
+    cancelSectionScroll();
     const start = scrollY;
     const end = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight,
       target.getBoundingClientRect().top + start - parseFloat(getComputedStyle(target).scrollMarginTop || '0')));
@@ -30,7 +31,7 @@ export function initSectionScrolling() {
       target.focus({ preventScroll: true });
       if (previousTabIndex === null) target.removeAttribute('tabindex');
       else target.setAttribute('tabindex', previousTabIndex);
-      cancel();
+      cancelSectionScroll();
     };
     if (reducedMotion.matches || Math.abs(end - start) < 1) { finish(); return; }
     const started = performance.now();
@@ -44,13 +45,13 @@ export function initSectionScrolling() {
     frame = requestAnimationFrame(tick);
   });
 
-  window.addEventListener('wheel', cancel, { passive: true });
-  window.addEventListener('touchstart', cancel, { passive: true });
+  window.addEventListener('wheel', cancelSectionScroll, { passive: true });
+  window.addEventListener('touchstart', cancelSectionScroll, { passive: true });
   window.addEventListener('keydown', event => {
-    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Escape', 'Tab'].includes(event.key)) cancel();
+    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Escape', 'Tab'].includes(event.key)) cancelSectionScroll();
   });
-  window.addEventListener('popstate', cancel);
-  window.addEventListener('resize', cancel);
-  window.addEventListener('pagehide', cancel);
+  window.addEventListener('popstate', cancelSectionScroll);
+  window.addEventListener('resize', cancelSectionScroll);
+  window.addEventListener('pagehide', cancelSectionScroll);
   reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) finish?.(); });
 }

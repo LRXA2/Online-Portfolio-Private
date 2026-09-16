@@ -3,6 +3,7 @@ export type Category = 'internship' | 'personal' | 'year1' | 'year2' | 'others' 
 interface ProjectBase {
   slug: string;          // anchor-safe id, unique across all projects
   name: string;
+  startYear: number;     // chronological grouping, independent of display wording
   year: string;          // '2025' | '2024–2025' | 'Aug 2024 – present'
   category: Category;
   blurb: string;
@@ -49,6 +50,7 @@ export const projectData: Project[] = [
   {
     slug: 'project-crystal',
     name: 'Project Crystal',
+    startYear: 2025,
     year: '2025',
     category: 'internship',
     featured: true,
@@ -59,6 +61,7 @@ export const projectData: Project[] = [
   {
     slug: 'solarizable-roof-detection',
     name: 'Solarizable Roof Detection',
+    startYear: 2025,
     year: '2025',
     category: 'internship',
     blurb: 'Geospatial pipeline to identify solarizable rooftops across Singapore. Google Open Buildings for rooftop extraction, roof-size filtering to shortlist viable sites, and Google Maps API to enrich each site with address, tenant, and building type for feasibility analysis and solar lead generation.',
@@ -67,6 +70,7 @@ export const projectData: Project[] = [
   {
     slug: 'pangu-weather',
     name: 'Pangu Weather Experiment',
+    startYear: 2024,
     year: '2024',
     category: 'internship',
     blurb: 'Explored the Pangu weather model for long-range forecasting, implementing an autoregressive loop to extend the prediction horizon beyond the default output.',
@@ -75,6 +79,7 @@ export const projectData: Project[] = [
   {
     slug: 'forecast-model-evaluation',
     name: 'Forecast Model Evaluation',
+    startYear: 2024,
     year: '2024',
     category: 'internship',
     blurb: 'Benchmarked in-house forecasting models against third-party forecasts, using Seaborn for visual analysis and performance comparison.',
@@ -83,6 +88,7 @@ export const projectData: Project[] = [
   {
     slug: 'grafana-kql-migration',
     name: 'Grafana → KQL Migration',
+    startYear: 2024,
     year: '2024',
     category: 'internship',
     blurb: 'Migrated dashboards from SQL to KQL, including pipeline adjustments for changed data ingestion and transformation logic.',
@@ -128,6 +134,7 @@ export const projectData: Project[] = [
       ],
     },
     name: 'Personal-RAG',
+    startYear: 2025,
     year: '2025',
     category: 'personal',
     repo: 'https://github.com/LRXA2/Personal-RAG',
@@ -140,6 +147,7 @@ export const projectData: Project[] = [
     featured: true,
     name: 'Secretary Agent',
     status: 'Ongoing',
+    startYear: 2025,
     year: '2025–present',
     category: 'personal',
     repo: 'https://github.com/LRXA2/Secretary-Agent',
@@ -230,6 +238,7 @@ export const projectData: Project[] = [
   {
     slug: 'stock-forecast',
     name: 'Stock Forecast',
+    startYear: 2025,
     year: '2025',
     category: 'personal',
     repo: 'https://github.com/LRXA2/Stock-Forecast-Public',
@@ -239,6 +248,7 @@ export const projectData: Project[] = [
   {
     slug: 'attrition-risk-classifier',
     name: 'Attrition-Risk Classifier',
+    startYear: 2026,
     year: '2026',
     category: 'personal',
     repo: 'https://github.com/LRXA2/IBM-HR-Analytics-Employee-Attrition-Performance',
@@ -249,6 +259,7 @@ export const projectData: Project[] = [
     slug: 'medi-assist',
     event: 'Singapore Polytechnic',
     name: 'Medi Assist',
+    startYear: 2023,
     year: '2023',
     category: 'hackathon',
     repo: 'https://github.com/moustacheManHere/TryHacks2023',
@@ -258,6 +269,7 @@ export const projectData: Project[] = [
   {
     slug: 'vscode-ollama-chat',
     name: 'VS Code Ollama Chat',
+    startYear: 2025,
     year: '2025',
     category: 'personal',
     experimental: true,
@@ -268,6 +280,7 @@ export const projectData: Project[] = [
   {
     slug: 'mcp-server',
     name: 'Project-Control MCP Server',
+    startYear: 2025,
     year: '2025',
     category: 'personal',
     experimental: true,
@@ -360,6 +373,7 @@ export const projectData: Project[] = [
       ],
     },
     name: 'Garena AI Build 2026',
+    startYear: 2026,
     year: '2026',
     category: 'hackathon',
     event: 'Garena',
@@ -373,6 +387,7 @@ export const projectData: Project[] = [
   {
     slug: 'us-housing',
     name: 'US Housing Prices Prediction',
+    startYear: 2022,
     year: '2022',
     category: 'year1',
     blurb: 'Supervised regression on 545 houses; categorical encoding and skew transforms to improve model performance.',
@@ -381,6 +396,7 @@ export const projectData: Project[] = [
   {
     slug: 'credit-card-default',
     name: 'Credit Card Default Prediction',
+    startYear: 2022,
     year: '2022',
     category: 'year1',
     blurb: 'Supervised classification over 1,600 customers — demographics, credit limits, bill amounts, payment history — to predict next-month default.',
@@ -389,6 +405,7 @@ export const projectData: Project[] = [
   {
     slug: 'dvd-rentals',
     name: 'DVD Rentals Website',
+    startYear: 2022,
     year: '2022',
     category: 'year1',
     blurb: 'Full-stack DVD rental site: browse, rent, like, and review titles, with accounts and an admin panel for managing users and listings.',
@@ -397,6 +414,7 @@ export const projectData: Project[] = [
   {
     slug: 'portfolio-site',
     name: 'Portfolio',
+    startYear: 2022,
     year: '2022',
     category: 'year1',
     blurb: 'Static personal portfolio site showcasing skills, projects, and background.',
@@ -405,6 +423,7 @@ export const projectData: Project[] = [
   {
     slug: 'sg-transport-eda',
     name: 'SG Transport EDA',
+    startYear: 2022,
     year: '2022',
     category: 'year1',
     blurb: 'Exploratory data analysis of Singapore public transport with interactive and statistical visualizations.',
@@ -413,6 +432,7 @@ export const projectData: Project[] = [
   {
     slug: 'wordpress-admin',
     name: 'WordPress Admin',
+    startYear: 2022,
     year: '2022',
     category: 'year1',
     blurb: 'System administration on a local environment: user groups and file/directory permissions for a WordPress installation.',
@@ -421,6 +441,7 @@ export const projectData: Project[] = [
   {
     slug: 'customer-segmentation',
     name: 'Customer Segmentation',
+    startYear: 2023,
     year: '2023',
     category: 'year1',
     blurb: 'Unsupervised clustering of 200 mall customers (gender, age, income, spending) to surface high-value segments for targeted marketing.',
@@ -429,6 +450,7 @@ export const projectData: Project[] = [
   {
     slug: 'utilities-time-series',
     name: 'Utilities Time-Series',
+    startYear: 2023,
     year: '2023',
     category: 'year1',
     blurb: 'Statsmodels time-series forecast of monthly gas, electricity, and water consumption to support resource planning.',
@@ -437,6 +459,7 @@ export const projectData: Project[] = [
   {
     slug: 'grocery-oltp',
     name: 'Grocery Store OLTP',
+    startYear: 2023,
     year: '2023',
     category: 'year1',
     blurb: 'Relational OLTP database for a grocery store — inventory, employees, customers, transactions — with an ERD, a normalized schema, and complex SQL reporting.',
@@ -447,6 +470,7 @@ export const projectData: Project[] = [
   {
     slug: 'vegetable-cnn',
     name: 'Vegetable CNN',
+    startYear: 2023,
     year: '2023',
     category: 'year2',
     blurb: 'Multi-class vegetable image classification across 15 categories, with CNNs trained at 31×31 and 128×128 to compare performance across resolutions.',
@@ -455,6 +479,7 @@ export const projectData: Project[] = [
   {
     slug: 'next-word-rnn',
     name: 'Next-Word RNN',
+    startYear: 2023,
     year: '2023',
     category: 'year2',
     blurb: 'RNN that predicts the next word in a quote; tokenized quote data trains a sequence model for contextually relevant completions.',
@@ -463,6 +488,7 @@ export const projectData: Project[] = [
   {
     slug: 'caesar-cipher',
     name: 'Caesar Cipher Library',
+    startYear: 2023,
     year: '2023',
     category: 'year2',
     blurb: 'Reusable, modular Caesar cipher encrypt/decrypt library built with OOP principles for easy integration.',
@@ -471,6 +497,7 @@ export const projectData: Project[] = [
   {
     slug: 'driver-etl',
     name: 'Driver Data ETL',
+    startYear: 2023,
     year: '2023',
     category: 'year2',
     blurb: 'Team analytics for a fictional ride-hailing company: CSV into a SQL database, analyzed via SQLAlchemy with outlier removal, interpolation, and feature engineering; insights visualized in Tableau.',
@@ -479,6 +506,7 @@ export const projectData: Project[] = [
   {
     slug: 'computer-co-mongodb',
     name: 'Computer Co. MongoDB',
+    startYear: 2023,
     year: '2023',
     category: 'year2',
     blurb: 'MongoDB analysis of accessory data: JSON import into collections and aggregation queries for unsold products, stock distribution, and warehouse-level metrics.',
@@ -487,6 +515,7 @@ export const projectData: Project[] = [
   {
     slug: 'computer-co-olap',
     name: 'Computer Co. OLAP/ETL',
+    startYear: 2023,
     year: '2023',
     category: 'year2',
     blurb: 'Data warehouse in Microsoft SQL Server: extract from multiple formats (CSV, TSV, Excel, JSON, SQL, TXT), ETL into a star schema, and reporting queries for sales, trends, profitability, and inventory.',
@@ -495,6 +524,7 @@ export const projectData: Project[] = [
   {
     slug: 'cifar10-gan',
     name: 'CIFAR-10 GAN',
+    startYear: 2024,
     year: '2024',
     category: 'year2',
     blurb: 'GAN trained on CIFAR-10; adversarial generator/discriminator learning produces realistic 32×32 color images across the 10 classes.',
@@ -503,6 +533,7 @@ export const projectData: Project[] = [
   {
     slug: 'pendulum-dqn',
     name: 'Pendulum DQN',
+    startYear: 2024,
     year: '2024',
     category: 'year2',
     blurb: 'Deep Q-Network on the OpenAI Gym Pendulum environment, learning a value-based control policy through trial-and-error interaction.',
@@ -511,6 +542,7 @@ export const projectData: Project[] = [
   {
     slug: 'math-parse-tree',
     name: 'Math Parse Tree',
+    startYear: 2024,
     year: '2024',
     category: 'year2',
     blurb: 'Parses mathematical expressions into trees for structured representation and evaluation via traversal — data structures, algorithms, and OOP.',
@@ -519,6 +551,7 @@ export const projectData: Project[] = [
   {
     slug: 'vegetable-deploy',
     name: 'Vegetable Deploy',
+    startYear: 2024,
     year: '2024',
     category: 'year2',
     blurb: 'Built and deployed TensorFlow CNN models with Docker, Flask, TensorFlow Serving, and Render; PyTest for testing; Agile DevOps with GitLab CI/CD.',
@@ -527,6 +560,7 @@ export const projectData: Project[] = [
   {
     slug: 'cab-trips-classifier',
     name: 'Cab Trips Classifier',
+    startYear: 2024,
     year: '2024',
     category: 'year2',
     blurb: 'End-to-end team data science project classifying cab trips as dangerous or not. Scrum workflow; ingestion, preprocessing, SMOTE balancing, and a Logistic Regression model deployed via a Tkinter app, tracked with MLflow and persisted with pickle.',
@@ -537,6 +571,7 @@ export const projectData: Project[] = [
   {
     slug: 'nus-math-automation',
     name: 'NUS Math Dept Automation',
+    startYear: 2023,
     year: '2023',
     category: 'others',
     blurb: 'Optimized operational processes with Power Automate: automated teaching-point redemption fund management, Educator Track funding expense tracking, and overseas PhD financial support.',

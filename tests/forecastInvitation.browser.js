@@ -1,6 +1,7 @@
-// Run with Playwright browser_run_code_unsafe; requires the local dev server.
-async (page) => {
-  await page.goto('http://127.0.0.1:4321/Online-Portfolio-Private/');
+import { test } from '@playwright/test';
+
+test("forecastInvitation", async ({ page }) => {
+  await page.goto('./');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const invitation = page.getByRole('button', { name: 'Explore anatomy of a forecast', exact: true });
   const caption = page.getByText('ANATOMY OF A FORECAST', { exact: true });
@@ -24,4 +25,4 @@ async (page) => {
   if (!await dialog.isVisible()) throw new Error('The diagram must still open the explorer');
   await page.keyboard.press('Escape');
   return 'Invitation click, Enter, Space, focus return and diagram click passed';
-}
+});

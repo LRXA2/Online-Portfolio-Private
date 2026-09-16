@@ -1,9 +1,10 @@
-// Run with browser_run_code's filename argument against the local Astro server.
-async (page) => {
+import { test } from '@playwright/test';
+
+test("testimonialChoices", async ({ page }) => {
   await page.bringToFront();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('http://localhost:4321/Online-Portfolio-Private/');
+  await page.goto('./');
   const bar = page.getByRole('slider', { name: 'Scroll testimonial choices' });
   if (!await bar.count() || !await bar.isVisible()) throw new Error('Mobile choices need a separate visible scrollbar');
   const strip = page.locator('.quote-selectors');
@@ -26,4 +27,4 @@ async (page) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   if (await bar.isVisible()) throw new Error('Mobile scrollbar must stay hidden on desktop');
   return { passed: true };
-}
+});

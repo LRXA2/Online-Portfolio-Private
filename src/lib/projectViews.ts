@@ -1,3 +1,4 @@
+import { cancelSectionScroll } from './sectionScrolling';
 import { gsap } from 'gsap';
 import { Flip } from 'gsap/Flip';
 
@@ -21,6 +22,7 @@ export function initProjectViews() {
 
   function switchView(next: View, animate = true) {
     if (next === view) return;
+    cancelSectionScroll();
     transition?.progress(1).kill();
     const motion = animate && !reduce.matches;
     const state = motion ? Flip.getState(rows) : undefined;

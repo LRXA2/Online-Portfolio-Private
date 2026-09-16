@@ -1,9 +1,10 @@
-// Run with browser_run_code's filename argument against the local Astro server.
-async (page) => {
+import { test } from '@playwright/test';
+
+test("navbarOverflow", async ({ page }) => {
   await page.bringToFront();
   for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('http://localhost:4321/Online-Portfolio-Private/');
+    await page.goto('./');
     const result = await page.locator('.navbar-menu').evaluate(menu => {
       menu.scrollTop = 100;
       const bounds = menu.getBoundingClientRect();
@@ -20,4 +21,4 @@ async (page) => {
       throw new Error('Navbar must fit its links without vertical scrolling at ' + width + ': ' + JSON.stringify(result));
   }
   return { passed: true };
-}
+});

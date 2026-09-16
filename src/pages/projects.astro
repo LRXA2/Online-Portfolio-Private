@@ -12,7 +12,7 @@ if (new Set(slugs).size !== slugs.length) {
   throw new Error('projects.ts: duplicate slug detected');
 }
 
-type SectionDef = { id: Exclude<Category, never>; label: string; sub: string };
+type SectionDef = { id: Category; label: string; sub: string };
 const SECTIONS: SectionDef[] = [
   { id: 'internship', label: 'Internship', sub: 'Sembcorp · 2024–2025' },
   ...(projectData.some(p => p.category === 'hackathon') ? [{ id: 'hackathon' as const, label: 'Hackathons', sub: '' }] : []),
@@ -22,16 +22,10 @@ const SECTIONS: SectionDef[] = [
   { id: 'year1', label: 'School · Year 1', sub: '' },
 ];
 
-// The first year in the display date is the project's starting year.
-const startYears = new Map(projectData.map(project => {
-  const year = project.year.match(/\b\d{4}\b/)?.[0];
-  if (!year) throw new Error(`Missing starting year for ${project.slug}`);
-  return [project.slug, year];
-}));
-const YEARS = [...new Set(startYears.values())].sort((a, b) => Number(b) - Number(a));
+const YEARS = [...new Set(projectData.map(project => project.startYear))].sort((a, b) => b - a);
 const NAV = [
   ...SECTIONS.map(s => ({ id: s.id, label: s.label })),
-  ...YEARS.map(year => ({ id: `year-${year}`, label: year, hidden: true })),
+  ...YEARS.map(year => ({ id: `year-${year}`, label: String(year), hidden: true })),
 ];
 
 const bySection = (id: Category) => projectData.filter((p) => p.category === id);
@@ -46,13 +40,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <p class="proj-hero__intro">
         Internship work, personal builds, hackathons, and coursework.
       </p>
-      <nav class="project-bookmarks" aria-label="Highlighted projects"><span>Highlights</span>{featuredProjects.map(p => <a href={`#${p.slug}`}>{p.name} <span aria-hidden="true">&#8600;</span></a>)}</nav>
+      <nav class="project-bookmarks" aria-label="Highlighted projects"><span>Highlights</span>{featuredProjects.map(p => <a data-section-link href={`#${p.slug}`}>{p.name} <span aria-hidden="true">&#8600;</span></a>)}</nav>
     </div>
   </header>
 
   <div class="proj-shell">
-    <div class="project-navigation">
-      <SectionNav items={NAV} label="Jump to section" />
+    <div class="project-navigation" id="project-navigation">
+      <SectionNav stickyContainerId="project-navigation" items={NAV} label="Jump to section" />
       <div class="project-view" hidden data-view="category">
       <div class="project-view__buttons" role="group" aria-label="Group projects by">
         <button type="button" data-project-view="category" aria-pressed="true" aria-controls="project-groups">Category</button>
@@ -77,7 +71,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
               </div>
               <ol class="proj-list">
                 {rows.map((p, ri) => (
-                  <li class:list={["proj-row", { "proj-row--featured": p.featured }]} id={p.slug} data-category={p.category} data-start-year={startYears.get(p.slug)}>
+                  <li class:list={["proj-row", { "proj-row--featured": p.featured }]} id={p.slug} data-category={p.category} data-start-year={p.startYear}>
 
                     <span class="row-num">{pad(ri + 1)}</span>
                     <h3 class="row-name">
@@ -114,7 +108,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           <div class="section-head">
             <span class="section-head__index">{pad(index + 1)}</span>
             <h2 class="section-head__kicker">{year}</h2>
-            <span class="section-head__count">[{pad(projectData.filter(p => startYears.get(p.slug) === year).length)}]</span>
+            <span class="section-head__count">[{pad(projectData.filter(p => p.startYear === year).length)}]</span>
           </div>
           <ol class="proj-list"></ol>
         </section>)}

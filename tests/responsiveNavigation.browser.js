@@ -1,9 +1,10 @@
-// Run with browser_run_code's filename argument against the local Astro server.
-async (page) => {
+import { test } from '@playwright/test';
+
+test("responsiveNavigation", async ({ page }) => {
   await page.bringToFront();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 320, height: 1000 });
-  await page.goto('http://localhost:4321/Online-Portfolio-Private/projects');
+  await page.goto('./projects');
   const enlarged = await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
   await page.locator('[data-project-view="year"]').click();
   const assertAnchorClear = async () => {
@@ -20,4 +21,4 @@ async (page) => {
   await page.locator('[data-project-view="category"]').click();
   await assertAnchorClear();
   return { passed: true };
-}
+});

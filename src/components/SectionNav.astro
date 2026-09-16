@@ -2,10 +2,11 @@
 interface Props {
   items: { id: string; label: string; hidden?: boolean }[];
   label: string;
+  stickyContainerId?: string;
 }
-const { items, label } = Astro.props;
+const { items, label, stickyContainerId } = Astro.props;
 ---
-<nav class="section-nav" aria-label={label}>
+<nav data-sticky-container={stickyContainerId} class="section-nav" aria-label={label}>
   {items.map(item => <a href={`#${item.id}`} hidden={item.hidden}>{item.label}</a>)}
 </nav>
 
@@ -25,6 +26,9 @@ const { items, label } = Astro.props;
   initSectionScrolling();
 
   document.querySelectorAll<HTMLElement>('.section-nav').forEach(nav => {
+    const stickyContainer = nav.dataset.stickyContainer
+      ? document.getElementById(nav.dataset.stickyContainer)!
+      : nav;
     const allEntries = Array.from(nav.querySelectorAll<HTMLAnchorElement>('a')).flatMap(link => {
       const section = document.getElementById(link.hash.slice(1));
       return section ? [{ link, section }] : [];
@@ -33,7 +37,7 @@ const { items, label } = Astro.props;
     function update() {
       frame = 0;
       const entries = allEntries.filter(entry => !entry.link.hidden && !entry.section.hidden);
-      const threshold = parseFloat(getComputedStyle(nav).top) + nav.offsetHeight + 24;
+      const threshold = stickyContainer.getBoundingClientRect().bottom + 24;
       let active = entries[0];
       for (const entry of entries) {
         if (entry.section.getBoundingClientRect().top <= threshold) active = entry;
@@ -55,6 +59,7 @@ const { items, label } = Astro.props;
     // Expanded reference letters change section positions without a resize event.
     const observer = new ResizeObserver(schedule);
     observer.observe(document.body);
+    observer.observe(stickyContainer);
     update();
   });
 </script>
